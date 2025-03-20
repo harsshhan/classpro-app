@@ -1,4 +1,5 @@
 import 'package:classpro/colors.dart';
+import 'package:classpro/widgets/attendance.dart';
 import 'package:classpro/widgets/timetable.dart';
 import 'package:flutter/material.dart';
 
@@ -18,9 +19,10 @@ class _HomeState extends State<Home> {
           child:Scaffold(
                     backgroundColor: AppColors.bgColor,
                     body: Padding(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(12),
             child: SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -34,7 +36,12 @@ class _HomeState extends State<Home> {
                     ],
                   ),
                   Timetable(),
-                  
+                  SizedBox(height: 15,),
+                  Text("Attendance",style: TextStyle(
+                              fontSize: 24,
+                              color: Colors.white,
+                  )),
+                  Attendance()
                 ],
               ),
             ),
