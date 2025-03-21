@@ -18,7 +18,6 @@ class _AttendanceState extends State<Attendance> {
   @override
   void initState() {
     super.initState();
-    // Parse your JSON data
     final jsonData = '''{
       "regNumber": "RA2311026010086",
       "attendance": [
@@ -158,7 +157,7 @@ class _AttendanceState extends State<Attendance> {
                             ),
                           ),
                           SizedBox(width: 12),
-                          Container(
+                          SizedBox(
                             width: MediaQuery.of(context).size.width * 0.5,
                             child: Text(
                               course['courseTitle'],
@@ -245,36 +244,4 @@ class _AttendanceState extends State<Attendance> {
   });
   }
 
-  Color _getCourseColor(String courseCode) {
-    if (courseCode.contains('MAB')) return Colors.amber;
-    if (courseCode.contains('CSC')) return Colors.blue;
-    if (courseCode.contains('CSE')) return Colors.green;
-    if (courseCode.contains('PDH')) return Colors.purple;
-    if (courseCode.contains('LEM')) return Colors.orange;
-    return Colors.teal;
   }
-
-  String _calculateMargin(dynamic course) {
-    final int totalClasses = int.parse(course['hoursConducted']);
-    final int absences = int.parse(course['hoursAbsent']);
-    
-    // Calculate how many more classes can be missed while keeping attendance above 75%
-    final int minRequired = (totalClasses * 0.75).ceil();
-    final int attended = totalClasses - absences;
-    final int margin = attended - minRequired;
-    
-    return margin.toString();
-  }
-  
-  // Get margin color based on value
-  Color _getMarginColor(dynamic course) {
-    final int margin = int.parse(_calculateMargin(course));
-    if (margin < 0) return Colors.red;
-    if (margin <= 2) return Colors.orange;
-    return Colors.blue;
-  }
-
-  }
-
-
-  
