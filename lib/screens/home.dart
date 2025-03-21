@@ -1,5 +1,6 @@
 import 'package:classpro/colors.dart';
 import 'package:classpro/widgets/attendance.dart';
+import 'package:classpro/widgets/marks.dart';
 import 'package:classpro/widgets/timetable.dart';
 import 'package:flutter/material.dart';
 
@@ -36,12 +37,18 @@ class _HomeState extends State<Home> {
                     ],
                   ),
                   Timetable(),
-                  SizedBox(height: 15,),
+                  SizedBox(height: 20,),
                   Text("Attendance",style: TextStyle(
                               fontSize: 24,
                               color: Colors.white,
                   )),
-                  Attendance()
+                  Attendance(),
+                  SizedBox(height: 20,),
+                  Text("Marks",style: TextStyle(
+                              fontSize: 24,
+                              color: Colors.white,
+                  )),
+                  Marks()
                 ],
               ),
             ),

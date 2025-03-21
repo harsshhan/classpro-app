@@ -1,8 +1,6 @@
 import 'package:classpro/screens/home.dart';
-import 'package:classpro/widgets/timetable.dart';
 import 'package:flutter/material.dart';
 
-import 'screens/login.dart';
 
 void main() {
   runApp(const MyApp());
