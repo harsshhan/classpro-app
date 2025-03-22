@@ -58,7 +58,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
         return true;
       }
     } catch (e) {
-      print('Error validating token: $e');
       return false;
     }
   }

@@ -1,4 +1,5 @@
 import 'package:classpro/screens/home.dart';
+import 'package:classpro/screens/loading_screen.dart';
 import 'package:classpro/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -23,8 +24,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         routes: {
-    '/': (context) => const Login(),
-    '/home': (context) => const Home(),
+          '/':(context) => LoadingScreen(),
+    '/login': (context) =>  Login(),
+    '/home': (context) =>  Home(),
   },
         initialRoute: '/',
       
