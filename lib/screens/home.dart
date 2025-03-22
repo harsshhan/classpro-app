@@ -4,6 +4,7 @@ import 'package:classpro/widgets/marks.dart';
 import 'package:classpro/widgets/timetable.dart';
 import 'package:flutter/material.dart';
 
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -48,7 +49,7 @@ class _HomeState extends State<Home> {
                               fontSize: 24,
                               color: Colors.white,
                   )),
-                  Marks()
+                  Marks(),
                 ],
               ),
             ),

@@ -1,6 +1,5 @@
-import 'dart:convert';
+import 'package:classpro/api/service.dart';
 import 'package:flutter/material.dart';
-
 
 class Timetable extends StatefulWidget {
   const Timetable({super.key});
@@ -10,63 +9,44 @@ class Timetable extends StatefulWidget {
 }
 
 class _TimetableState extends State<Timetable> {
-  final String jsonData = '''
-  {
-    "schedule": [
-      {
-        "day": 2,
-        "table": [
-          null, null, null, null, null,
-          {
-            "code": "21CSC204J",
-            "name": "Design and Analysis of Algorithms",
-            "slot": "B",
-            "roomNo": "LH506",
-            "courseType": "Theory",
-            "online": false,
-            "isOptional": false
-          },
-          {
-            "code": "21CSC204J",
-            "name": "Design and Analysis of Algorithms",
-            "slot": "B",
-            "roomNo": "LH506",
-            "courseType": "Theory",
-            "online": false,
-            "isOptional": false
-          },
-          {
-            "code": "21LEM202T",
-            "name": "UHV-II",
-            "slot": "G",
-            "roomNo": "LH506",
-            "courseType": "Theory",
-            "online": false,
-            "isOptional": false
-          },
-          {
-            "code": "21LEM202T",
-            "name": "UHV-II",
-            "slot": "G",
-            "roomNo": "LH506",
-            "courseType": "Theory",
-            "online": false,
-            "isOptional": false
-          },
-          {
-            "code": "21MAB204T",
-            "name": "Probability and Queueing Theory",
-            "slot": "A",
-            "roomNo": "LH506",
-            "courseType": "Theory",
-            "online": false,
-            "isOptional": false
-          }
-        ]
-      }
-    ]
+  List<dynamic> subjects = [];
+  bool isLoading = true;
+  String? errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTimetable();
   }
-  ''';
+
+  Future<void> _fetchTimetable() async {
+    try {
+      final Map<String, dynamic> data = await (await ApiService.create()).getTimetable();
+
+      if (data.containsKey("schedule") && data["schedule"] != null) {
+        final List<dynamic> schedule = data["schedule"];
+
+        if (schedule.isNotEmpty && schedule[0]["table"] != null) {
+          setState(() {
+            subjects = schedule[0]["table"];
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            errorMessage = "No timetable data available.";
+            isLoading = false;
+          });
+        }
+      } else {
+        throw Exception("Invalid or null data received.");
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = "Error fetching timetable: $e";
+        isLoading = false;
+      });
+    }
+  }
 
   final List<String> timeSlots = [
     "8:00-8:50",
@@ -83,9 +63,22 @@ class _TimetableState extends State<Timetable> {
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> data = jsonDecode(jsonData);
-    final List<dynamic> schedule = data["schedule"];
-    final List<dynamic> subjects = schedule[0]["table"];
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            errorMessage!,
+            style: const TextStyle(color: Colors.red, fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
 
     return SingleChildScrollView(
       child: ListView.builder(
@@ -93,9 +86,8 @@ class _TimetableState extends State<Timetable> {
         physics: const NeverScrollableScrollPhysics(),
         itemCount: timeSlots.length,
         itemBuilder: (context, index) {
-          final subject = subjects[index];
+          final subject = index < subjects.length ? subjects[index] : null;
 
-          // Determine border radius
           BorderRadius borderRadius = BorderRadius.zero;
           if (index == 0) {
             borderRadius = const BorderRadius.only(
@@ -116,20 +108,18 @@ class _TimetableState extends State<Timetable> {
                 margin: const EdgeInsets.symmetric(vertical: 0.4, horizontal: 12),
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
-                  color: subject != null ? Color.fromRGBO(235, 215, 112, 1) : Color.fromRGBO(63, 90, 50, 3),
+                  color: subject != null ? const Color.fromRGBO(235, 215, 112, 1) : const Color.fromRGBO(63, 90, 50, 1),
                   borderRadius: borderRadius,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
                   children: [
-                    
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          subject == null ? "" : subject["name"],
+                          subject != null ? (subject["name"] ?? "No Class") : "No Class",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
@@ -138,7 +128,9 @@ class _TimetableState extends State<Timetable> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          subject != null ? subject["roomNo"] : "",
+                          subject != null && subject["roomNo"] != null
+                              ? subject["roomNo"]
+                              : "",
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.black54,
@@ -164,7 +156,6 @@ class _TimetableState extends State<Timetable> {
                   ],
                 ),
               ),
-              
             ],
           );
         },

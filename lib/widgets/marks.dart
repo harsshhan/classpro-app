@@ -1,6 +1,6 @@
-import 'dart:convert';
-import 'package:classpro/colors.dart';
 import 'package:flutter/material.dart';
+import '../api/service.dart';
+import 'package:classpro/colors.dart';
 
 class Marks extends StatefulWidget {
   const Marks({super.key});
@@ -10,139 +10,76 @@ class Marks extends StatefulWidget {
 }
 
 class _MarksState extends State<Marks> {
-  String jsonData = '''
-{
-  "regNumber": "RA2311026010086",
-  "marks": [
-    {
-      "courseName": "Design and Analysis of Algorithms",
-      "courseCode": "21CSC204J",
-      "courseType": "Practical",
-      "overall": {
-        "scored": "0.00",
-        "total": "0.00"
-      },
-      "testPerformance": null
-    },
-    {
-      "courseName": "Probability and Queueing Theory",
-      "courseCode": "21MAB204T",
-      "courseType": "Theory",
-      "overall": {
-        "scored": "16.50",
-        "total": "20.00"
-      },
-      "testPerformance": [
-        {
-          "test": "FT-I",
-          "marks": {
-            "scored": "5.00",
-            "total": "5.00"
-          }
-        },
-        {
-          "test": "FT-II",
-          "marks": {
-            "scored": "11.50",
-            "total": "15.00"
-          }
-        }
-      ]
-    },
-    {
-      "courseName": "Design and Analysis of Algorithms",
-      "courseCode": "21CSC204J",
-      "courseType": "Theory",
-      "overall": {
-        "scored": "11.00",
-        "total": "15.00"
-      },
-      "testPerformance": [
-        {
-          "test": "FJ-I",
-          "marks": {
-            "scored": "11.00",
-            "total": "15.00"
-          }
-        }
-      ]
-    },
-    {
-      "courseName": "Artificial Intelligence",
-      "courseCode": "21CSC206T",
-      "courseType": "Theory",
-      "overall": {
-        "scored": "14.70",
-        "total": "20.00"
-      },
-      "testPerformance": [
-        {
-          "test": "FT-I",
-          "marks": {
-            "scored": "4.10",
-            "total": "5.00"
-          }
-        },
-        {
-          "test": "FT-II",
-          "marks": {
-            "scored": "10.60",
-            "total": "15.00"
-          }
-        }
-      ]
-    },
-    {
-      "courseName": "Design and Analysis of Algorithms",
-      "courseCode": "21CSC204J",
-      "courseType": "Practical",
-      "overall": {
-        "scored": "0.00",
-        "total": "0.00"
-      },
-      "testPerformance": null
+  late List<dynamic> marksData = [];
+  late String regNumber = '';
+  bool isLoading = true;
+  String errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchMarksData(); 
+  }
+
+  Future<void> fetchMarksData() async {
+    try {
+      final Map<String, dynamic> parsedData = await (await ApiService.create()).getMarks();
+      setState(() {
+        regNumber = parsedData['regNumber'] ?? '';
+        marksData = parsedData['marks'] ?? [];
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Error fetching data: $e';
+      });
     }
-  ],
-  "status": 200
-}
-''';
+  }
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> data = jsonDecode(jsonData);
-    final List<dynamic> marks = data["marks"];
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-    // Separate theory and practical courses
+    if (errorMessage.isNotEmpty) {
+      return Center(
+        child: Text(
+          errorMessage,
+          style: const TextStyle(color: Colors.red),
+        ),
+      );
+    }
+
     final List<dynamic> theoryCourses =
-        marks.where((course) => course['courseType'] == 'Theory').toList();
+        marksData.where((course) => course['courseType'] == 'Theory').toList();
     final List<dynamic> practicalCourses =
-        marks.where((course) => course['courseType'] == 'Practical').toList();
+        marksData.where((course) => course['courseType'] == 'Practical').toList();
 
     return ListView(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
       children: [
         ...theoryCourses.map((course) {
           return buildCourseCard(course);
-        }).toList(),
-
+        }),
         if (practicalCourses.isNotEmpty) ...[
-
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               "Practical",
               style: TextStyle(
-                color: Colors.orange,
-                fontSize: 18,
+                color: Colors.green,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
           ...practicalCourses.map((course) {
             return buildCourseCard(course);
-          }).toList(),
+          }),
         ],
       ],
     );
@@ -160,11 +97,11 @@ class _MarksState extends State<Marks> {
     }
 
     return Container(
-      margin: EdgeInsets.only(top: 5, bottom: 5),
-      padding: EdgeInsets.all(15),
+      margin: const EdgeInsets.only(top: 5, bottom: 5),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: Color.fromRGBO(25, 28, 32, 1),
+        color: const Color.fromRGBO(25, 28, 32, 1),
       ),
       height: cardHeight,
       child: Column(
@@ -176,7 +113,7 @@ class _MarksState extends State<Marks> {
               Expanded(
                 child: Text(
                   subjectName,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -190,7 +127,7 @@ class _MarksState extends State<Marks> {
                 radius: 15,
                 child: Text(
                   courseType == 'Theory' ? 'T' : 'P',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
@@ -199,7 +136,7 @@ class _MarksState extends State<Marks> {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           if (testPerformance != null)
             ...testPerformance.map((test) {
               final testName = test['test'];
@@ -224,13 +161,13 @@ class _MarksState extends State<Marks> {
                       : Colors.white;
 
               return Padding(
-                padding: EdgeInsets.only(bottom: 15),
+                padding: const EdgeInsets.only(bottom: 15),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       testName,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.grey,
                         fontSize: 16,
                       ),
@@ -238,49 +175,42 @@ class _MarksState extends State<Marks> {
                     Row(
                       children: [
                         Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(25),
+                            border: Border.all(
+                              color: isPerfectScore
+                                  ? Colors.green
+                                  : Colors.black,
+                            ),
                           ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  borderRadius: BorderRadius.circular(25),
-                                  border: Border.all(
-                                    color: isPerfectScore
-                                        ? Colors.green
-                                        : Colors.black,
-                                  ),
-                                ),
-                                child: Text(
-                                  scored,
-                                  style: TextStyle(
-                                    color: markColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: AppColors.tot_marks_bgColor,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                child: Text(
-                                  total,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
+                          child: Text(
+                            scored,
+                            style: TextStyle(
+                              color: markColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14
+                            ),
                           ),
-                        )
+                        ),
+                        const SizedBox(width: 5),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: AppColors.tot_marks_bgColor,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Text(
+                            total,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -291,11 +221,11 @@ class _MarksState extends State<Marks> {
             color: Colors.grey.shade600,
             thickness: 1,
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Total',
                 style: TextStyle(
                   color: Colors.white,
@@ -306,12 +236,12 @@ class _MarksState extends State<Marks> {
               Row(
                 children: [
                   Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Colors.black,
-                    ),
                     padding:
-                        EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                     child: Text(
                       overall['scored'],
                       style: TextStyle(
@@ -322,16 +252,17 @@ class _MarksState extends State<Marks> {
                       ),
                     ),
                   ),
+                  const SizedBox(width: 5),
                   Container(
                     padding:
-                        EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: AppColors.tot_marks_bgColor,
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
                       overall['total'],
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
