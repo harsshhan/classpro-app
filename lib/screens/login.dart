@@ -21,7 +21,7 @@ class _LoginState extends State<Login> {
     try {
       Dio dio = Dio();
       final response = await dio.post(
-        dotenv.env['API_URL']! + '/login',
+        '${dotenv.env['API_URL']!}/login',
         data: {
           "account": account,
           "password": password,

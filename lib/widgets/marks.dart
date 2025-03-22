@@ -116,7 +116,8 @@ class _MarksState extends State<Marks> {
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontFamily: 'geist-sans',
+                              fontWeight: FontWeight.w500,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),

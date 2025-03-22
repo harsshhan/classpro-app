@@ -121,8 +121,10 @@ class _TimetableState extends State<Timetable> {
                         Text(
                           subject != null ? (subject["name"] ?? "No Class") : "No Class",
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'geist-sans',
                             fontSize: 12,
+
                             color: subject != null ? Colors.black87 : Colors.green[900],
                           ),
                         ),
@@ -134,6 +136,8 @@ class _TimetableState extends State<Timetable> {
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.black54,
+                            fontFamily: 'geist-sans',
+                            fontWeight: FontWeight.w600
                           ),
                         ),
                       ],
@@ -148,6 +152,8 @@ class _TimetableState extends State<Timetable> {
                             style: const TextStyle(
                               color: Color.fromRGBO(0, 0, 0, 0.63),
                               fontSize: 10,
+                              fontFamily: 'geist-sans',
+                              fontWeight: FontWeight.w600
                             ),
                           ),
                         ),

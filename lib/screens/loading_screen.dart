@@ -44,7 +44,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Future<bool> _validateToken(String csrfToken) async {
     try {
       final response = await dio.get(
-        dotenv.env['API_URL']! + '/user', 
+        '${dotenv.env['API_URL']!}/user', 
         options: Options(
           headers: {
             'X-CSRF-Token': csrfToken,

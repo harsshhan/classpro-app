@@ -33,6 +33,8 @@ class _HomeState extends State<Home> {
                           style: TextStyle(
                               fontSize: 24,
                               color: Colors.white,
+                              fontFamily: 'geist-sans',
+                              fontWeight: FontWeight.w600,
                               decoration: TextDecoration.none)),
                       IconButton(onPressed: () {}, icon: Icon(Icons.download_sharp))
                     ],
@@ -42,12 +44,16 @@ class _HomeState extends State<Home> {
                   Text("Attendance",style: TextStyle(
                               fontSize: 24,
                               color: Colors.white,
+                              fontFamily: 'geist-sans',
+                              fontWeight: FontWeight.w600
                   )),
                   Attendance(),
                   SizedBox(height: 20,),
                   Text("Marks",style: TextStyle(
                               fontSize: 24,
                               color: Colors.white,
+                              fontFamily: 'geist-sans',
+                              fontWeight: FontWeight.w600
                   )),
                   Marks(),
                 ],

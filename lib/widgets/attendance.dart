@@ -116,8 +116,9 @@ class _AttendanceState extends State<Attendance> {
                             course['courseTitle'],
                             style: TextStyle(
                               color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                              fontSize: 16,
+                              fontFamily: 'geist-sans',
+                              fontWeight: FontWeight.w500,
                             ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
