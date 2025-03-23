@@ -1,5 +1,6 @@
 import 'dart:ui';
-
+import 'package:android_intent_plus/android_intent.dart' as android_intent;
+import 'dart:io' show Platform;
 import 'package:classpro/api/service.dart';
 import 'package:classpro/widgets/attendance.dart';
 import 'package:classpro/widgets/marks.dart';
@@ -9,10 +10,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../constants.dart';
 
-
-
 class Home extends StatefulWidget {
-  final Map<String,dynamic> userDataList;
+  final Map<String, dynamic> userDataList;
   const Home({super.key, required this.userDataList});
 
   @override
@@ -20,7 +19,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -208,11 +206,23 @@ class _HomeState extends State<Home> {
                             const url =
                                 'https://www.linkedin.com/in/harshan-am';
 
-                            if (await canLaunchUrl(Uri.parse(url))) {
-                              await launchUrl(Uri.parse(url),
-                                  mode: LaunchMode.externalApplication);
+                            if (Platform.isAndroid) {
+                              try {
+                                final intent = android_intent.AndroidIntent(
+                                  action: 'action_view',
+                                  data: url,
+                                );
+                                await intent.launch();
+                                print("Launched with intent");
+                              } catch (e) {
+                                print("Intent launch error: $e");
+                              }
                             } else {
-                              throw 'Could not launch $url';
+                              // For iOS devices
+                              if (await canLaunchUrl(Uri.parse(url))) {
+                                await launchUrl(Uri.parse(url),
+                                    mode: LaunchMode.externalApplication);
+                              }
                             }
                           },
                           child: Text(
@@ -237,6 +247,9 @@ class _HomeState extends State<Home> {
                 },
                 backgroundColor: Colors.transparent,
                 elevation: 0,
+                splashColor: Colors.transparent,
+                highlightElevation: 0,
+                hoverElevation: 0,
                 child: SizedBox(
                     height: 25,
                     child: Image.asset(
@@ -358,7 +371,8 @@ class _HomeState extends State<Home> {
                           child: Text(widget.userDataList['year'].toString(),
                               style: TextStyles.userDetailAns)),
                       Expanded(
-                          child: Text(widget.userDataList['semester'].toString(),
+                          child: Text(
+                              widget.userDataList['semester'].toString(),
                               style: TextStyles.userDetailAns)),
                     ],
                   ),
