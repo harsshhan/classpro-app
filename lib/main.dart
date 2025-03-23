@@ -1,4 +1,3 @@
-import 'package:classpro/screens/home.dart';
 import 'package:classpro/screens/loading_screen.dart';
 import 'package:classpro/screens/login.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      
         debugShowCheckedModeBanner: false,
         routes: {
           '/':(context) => LoadingScreen(),
