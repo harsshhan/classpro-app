@@ -1,8 +1,10 @@
-import 'package:classpro/colors.dart';
+import 'package:classpro/api/service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import '../constants.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -38,10 +40,10 @@ class _LoginState extends State<Login> {
           _showSnackbar('No cookies received in headers.');
         }
       } else {
-        _showSnackbar('Login failed: ${response.data['message']}');
+        _showSnackbar('Login failed: ');
       }
     } catch (e) {
-      _showSnackbar('Error logging in: $e');
+      _showSnackbar('Error logging in');
     }
     return false;
   }
@@ -156,7 +158,9 @@ class _LoginState extends State<Login> {
                           });
 
                           if (isLoggedIn) {
-                            Navigator.pushReplacementNamed(context, '/home');
+                            ApiService apiService = await ApiService.create();
+                            await apiService.validateToken(context);
+
                           } else {
                             _showSnackbar(
                                 'Login failed. Please check your credentials.');

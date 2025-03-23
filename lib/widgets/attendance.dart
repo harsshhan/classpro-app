@@ -1,7 +1,7 @@
-import 'package:classpro/colors.dart';
 import 'package:flutter/material.dart';
 
 import '../api/service.dart';
+import '../constants.dart';
 
 class Attendance extends StatefulWidget {
   const Attendance({super.key});

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../api/service.dart';
-import 'package:classpro/colors.dart';
+
+import '../constants.dart';
 
 class Marks extends StatefulWidget {
   const Marks({super.key});

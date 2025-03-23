@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../screens/home.dart';
 
 const FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
@@ -83,8 +85,47 @@ class ApiService {
     }
   }
 
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     await secureStorage.delete(key: 'X-CSRF-TOKEN');
-    print('CSRF token cleared. Logged out.');
+    Navigator.pushReplacementNamed(context, '/login');
   }
+
+
+  Future<bool> validateToken(BuildContext context,) async {
+  try {
+    String? csrfToken = await secureStorage.read(key: 'X-CSRF-TOKEN');
+    final response = await _dio.get(
+      '/user',
+      options: Options(
+        headers: {
+          'X-CSRF-Token': csrfToken,
+        },
+      ),
+    );
+
+    if (response.statusCode == 200 && response.data != null) {
+
+      Map<String, dynamic> userData = response.data; 
+
+      if (userData.isNotEmpty) {
+        if (context.mounted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Home(userDataList: userData), // ✅ Pass Map to Home
+            ),
+            (Route<dynamic> route) => false,
+          );
+        }
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } catch (e) {
+    return false;
+  }
+}
 }

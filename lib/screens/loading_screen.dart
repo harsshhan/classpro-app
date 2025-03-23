@@ -1,9 +1,7 @@
-import 'package:classpro/screens/home.dart';
-import 'package:classpro/screens/login.dart';
+import 'package:classpro/api/service.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:dio/dio.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -12,70 +10,78 @@ class LoadingScreen extends StatefulWidget {
   _LoadingScreenState createState() => _LoadingScreenState();
 }
 
-class _LoadingScreenState extends State<LoadingScreen> {
+class _LoadingScreenState extends State<LoadingScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  final Dio dio = Dio(); 
 
   @override
   void initState() {
     super.initState();
-    _checkAuthToken(); 
+
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 600), 
+      vsync: this,
+    );
+
+    _startHourglassAnimation();
+
+    _checkAuthToken(context);
   }
 
-  Future<void> _checkAuthToken() async {
+  Future<void> _startHourglassAnimation() async {
+    while (mounted) {
+      await _controller.forward(from: 0.0);
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+  }
+
+  Future<void> _checkAuthToken(BuildContext context) async {
     String? csrfToken = await secureStorage.read(key: 'X-CSRF-TOKEN');
 
     if (csrfToken != null && csrfToken.isNotEmpty) {
-      bool isValid = await _validateToken(csrfToken);
-
-      if (isValid) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) =>  Home()),
-        );
-      } else {
-        _navigateToLogin();
+      try {
+        await (await ApiService.create()).validateToken(context);
+      } catch (e) {
+        _navigateToLogin(context);
       }
     } else {
-      _navigateToLogin();
+      _navigateToLogin(context);
     }
   }
 
-  Future<bool> _validateToken(String csrfToken) async {
-    try {
-      final response = await dio.get(
-        '${dotenv.env['API_URL']!}/user', 
-        options: Options(
-          headers: {
-            'X-CSRF-Token': csrfToken,
-          },
-        ),
-      );
-
-      if (response.statusCode == 401 || response.statusCode == 500) {
-        return false;
-      } else {
-        return true;
-      }
-    } catch (e) {
-      return false;
-    }
-  }
-
-  void _navigateToLogin() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) =>  Login()),
-    );
+  void _navigateToLogin(BuildContext context) {
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
+    return Scaffold(
+      backgroundColor: Color.fromRGBO(26, 29, 33, 1), 
       body: Center(
-        child: CircularProgressIndicator(), 
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Transform.rotate(
+              angle: _controller.value * 3.141592653589793, 
+              child: SizedBox(
+                height: 96,
+                width: 48,
+                child: Image.asset(
+                  'assets/icons/loading_icon.png', color: Color.fromRGBO(178, 178, 207, 1),
+                  fit: BoxFit.contain,
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
