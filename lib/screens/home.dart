@@ -142,7 +142,7 @@ class _HomeState extends State<Home> {
             ),
           ),
           body: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(18),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +153,7 @@ class _HomeState extends State<Home> {
                       const Text(
                         "Timetable",
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           color: Colors.white,
                           fontFamily: 'geist-sans',
                           fontWeight: FontWeight.w600,
@@ -172,7 +172,7 @@ class _HomeState extends State<Home> {
                   const Text(
                     "Attendance",
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 20,
                       color: Colors.white,
                       fontFamily: 'geist-sans',
                       fontWeight: FontWeight.w600,
@@ -182,7 +182,7 @@ class _HomeState extends State<Home> {
                   const Text(
                     "Marks",
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 20,
                       color: Colors.white,
                       fontFamily: 'geist-sans',
                       fontWeight: FontWeight.w600,
@@ -308,7 +308,7 @@ class _HomeState extends State<Home> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             child: Container(
-              width: MediaQuery.of(context).size.width - 40,
+              width: MediaQuery.of(context).size.width * 0.9,
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
                 color: Color.fromRGBO(31, 35, 42, 1),
@@ -362,7 +362,7 @@ class _HomeState extends State<Home> {
                     ],
                   ),
                   SizedBox(
-                    height: 5,
+                    height: 2,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -393,7 +393,7 @@ class _HomeState extends State<Home> {
                     ],
                   ),
                   SizedBox(
-                    height: 5,
+                    height: 2,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -414,7 +414,7 @@ class _HomeState extends State<Home> {
                     style: TextStyles.userDetailQn,
                   ),
                   SizedBox(
-                    height: 5,
+                    height: 2,
                   ),
                   Text(
                     widget.userDataList['program'],
@@ -428,7 +428,7 @@ class _HomeState extends State<Home> {
                     style: TextStyles.userDetailQn,
                   ),
                   SizedBox(
-                    height: 5,
+                    height: 2,
                   ),
                   Text(widget.userDataList['department'],
                       style: TextStyle(

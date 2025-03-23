@@ -105,7 +105,7 @@ class _TimetableState extends State<Timetable> {
             children: [
               Container(
                 height: 64,
-                margin: const EdgeInsets.symmetric(vertical: 0.4, horizontal: 12),
+                margin: const EdgeInsets.symmetric(vertical: 0.4),
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
                   color: subject != null ? const Color.fromRGBO(235, 215, 112, 1) : const Color.fromRGBO(63, 90, 50, 1),
