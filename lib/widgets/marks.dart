@@ -94,7 +94,7 @@ class _MarksState extends State<Marks> {
 
     double cardHeight = 150.0;
     if (testPerformance != null) {
-      cardHeight += testPerformance.length * 40.0;
+      cardHeight += testPerformance.length * 45.0;
     }
 
     return Container(
@@ -114,12 +114,7 @@ class _MarksState extends State<Marks> {
               Expanded(
                 child: Text(
                   subjectName,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontFamily: 'geist-sans',
-                              fontWeight: FontWeight.w500,
-                  ),
+                  style: TextStyles.courseName,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

@@ -11,6 +11,11 @@ class TextStyles {
     fontWeight: FontWeight.w600,
     color: Colors.white
   );
+  static const TextStyle courseName = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+    color: Colors.white
+  );
 
 }
 

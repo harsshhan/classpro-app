@@ -70,6 +70,7 @@ class _AttendanceState extends State<Attendance> {
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
+      
       itemCount: attendanceData.length,
       itemBuilder: (context, index) {
         final course = attendanceData[index];
@@ -82,8 +83,9 @@ class _AttendanceState extends State<Attendance> {
         Color percentageColor = percentage >= 75 ? Color(0xFF4CAF50) : Colors.red;
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal:0, vertical: 8.0),
           child: Container(
+            margin: EdgeInsets.zero,
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: backgroundColor,
@@ -114,12 +116,7 @@ class _AttendanceState extends State<Attendance> {
                           width: MediaQuery.of(context).size.width * 0.5,
                           child: Text(
                             course['courseTitle'],
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontFamily: 'geist-sans',
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: TextStyles.courseName,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
                           ),
@@ -167,6 +164,7 @@ class _AttendanceState extends State<Attendance> {
                         SizedBox(width: 10),
 
                         Container(
+                          margin: EdgeInsets.zero,
                           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Color(0xFF303030),
