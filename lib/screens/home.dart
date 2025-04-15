@@ -8,7 +8,7 @@ import 'package:classpro/widgets/timetable.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../constants.dart';
+import '../styles.dart';
 
 class Home extends StatefulWidget {
   final Map<String, dynamic> userDataList;
@@ -48,7 +48,7 @@ class _HomeState extends State<Home> {
                               color: Colors.white,
                               fontSize: 30,
                               fontWeight: FontWeight.w600,
-                              fontFamily: 'geist-sans',
+                              fontFamily: 'Geist',
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -98,8 +98,8 @@ class _HomeState extends State<Home> {
                         child: const Icon(Icons.person,
                             color: Color.fromRGBO(247, 226, 226, 1)),
                       ),
-                      title: const Text(
-                        'Harshan A M',
+                      title: Text(
+                        widget.userDataList['name'],
                         style: TextStyle(color: Colors.white),
                       ),
                       tileColor: Colors.black,
@@ -120,7 +120,7 @@ class _HomeState extends State<Home> {
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 12,
-                            fontFamily: 'geist-sans',
+                            fontFamily: 'Geist',
                             fontWeight: FontWeight.w500),
                       ),
                       SizedBox(
@@ -155,7 +155,7 @@ class _HomeState extends State<Home> {
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.white,
-                          fontFamily: 'geist-sans',
+                          fontFamily: 'Geist',
                           fontWeight: FontWeight.w600,
                           decoration: TextDecoration.none,
                         ),
@@ -169,22 +169,15 @@ class _HomeState extends State<Home> {
                   ),
                   const Timetable(),
                   const SizedBox(height: 20),
-                  const Text(
-                    "Attendance",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontFamily: 'geist-sans',
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  
                   const Attendance(),
+                  const SizedBox(height: 20),
                   const Text(
                     "Marks",
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.white,
-                      fontFamily: 'geist-sans',
+                      fontFamily: 'Geist',
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -342,7 +335,7 @@ class _HomeState extends State<Home> {
                     style: TextStyle(
                         color: Color.fromRGBO(179, 179, 209, 1),
                         fontSize: 18,
-                        fontFamily: 'geist-sans',
+                        fontFamily: 'Geist',
                         fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(

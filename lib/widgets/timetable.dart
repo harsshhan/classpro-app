@@ -12,6 +12,8 @@ class _TimetableState extends State<Timetable> {
   List<dynamic> subjects = [];
   bool isLoading = true;
   String? errorMessage;
+  int selectedDay = 1;
+  Map<String, dynamic>? timetableData;
 
   @override
   void initState() {
@@ -21,7 +23,8 @@ class _TimetableState extends State<Timetable> {
 
   Future<void> _fetchTimetable() async {
     try {
-      final Map<String, dynamic> data = await (await ApiService.create()).getTimetable();
+      final Map<String, dynamic> data =
+          await (await ApiService.create()).getTimetable();
 
       if (data.containsKey("schedule") && data["schedule"] != null) {
         final List<dynamic> schedule = data["schedule"];
@@ -29,6 +32,7 @@ class _TimetableState extends State<Timetable> {
         if (schedule.isNotEmpty && schedule[0]["table"] != null) {
           setState(() {
             subjects = schedule[0]["table"];
+            timetableData = data;
             isLoading = false;
           });
         } else {
@@ -80,92 +84,145 @@ class _TimetableState extends State<Timetable> {
       );
     }
 
-    return SingleChildScrollView(
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: timeSlots.length,
-        itemBuilder: (context, index) {
-          final subject = index < subjects.length ? subjects[index] : null;
+    return Column(
+      children: [
+        SingleChildScrollView(
+          child: ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: timeSlots.length,
+            itemBuilder: (context, index) {
+              // Get subjects for current day from schedule
+              final List<dynamic> daySubjects = timetableData?['schedule']
+                      ?.firstWhere((day) => day['day'] == selectedDay,
+                          orElse: () => {'table': []})['table'] ??
+                  [];
 
-          BorderRadius borderRadius = BorderRadius.zero;
-          if (index == 0) {
-            borderRadius = const BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            );
-          } else if (index == timeSlots.length - 1) {
-            borderRadius = const BorderRadius.only(
-              bottomLeft: Radius.circular(12),
-              bottomRight: Radius.circular(12),
-            );
-          }
+              final subject =
+                  index < daySubjects.length ? daySubjects[index] : null;
+              final bool isPractical =
+                  subject != null && subject["courseType"] == "Practical";
 
-          return Column(
-            children: [
-              Container(
-                height: 64,
-                margin: const EdgeInsets.symmetric(vertical: 0.4),
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                  color: subject != null ? const Color.fromRGBO(235, 215, 112, 1) : const Color.fromRGBO(63, 90, 50, 1),
-                  borderRadius: borderRadius,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          subject != null ? (subject["name"] ?? "No Class") : "No Class",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'geist-sans',
-                            fontSize: 10,
+              BorderRadius borderRadius = BorderRadius.zero;
+              if (index == 0) {
+                borderRadius = const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                );
+              } else if (index == timeSlots.length - 1) {
+                borderRadius = const BorderRadius.only(
+                  bottomLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                );
+              }
 
-                            color: subject != null ? Colors.black87 : Colors.green[900],
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          subject != null && subject["roomNo"] != null
-                              ? subject["roomNo"]
-                              : "",
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.black54,
-                            fontFamily: 'geist-sans',
-                            fontWeight: FontWeight.w600
-                          ),
-                        ),
-                      ],
+              return Column(
+                children: [
+                  Container(
+                    height: 64,
+                    margin: const EdgeInsets.symmetric(vertical: 0.4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: subject != null
+                          ? (isPractical
+                              ? const Color.fromRGBO(151, 223, 113, 1)
+                              : const Color.fromRGBO(235, 215, 112, 1))
+                          : const Color.fromRGBO(63, 90, 50, 1),
+                      borderRadius: borderRadius,
                     ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 5.0),
-                          child: Text(
-                            timeSlots[index],
-                            style: const TextStyle(
-                              color: Color.fromRGBO(0, 0, 0, 0.63),
-                              fontSize: 10,
-                              fontFamily: 'geist-sans',
-                              fontWeight: FontWeight.w600
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              subject != null
+                                  ? (subject["name"] ?? "No Class")
+                                  : "No Class",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Geist',
+                                fontSize: 10,
+                                color: subject != null
+                                    ? Colors.black87
+                                    : Colors.green[900],
+                              ),
                             ),
-                          ),
+                            const SizedBox(height: 4),
+                            Text(
+                              subject != null && subject["roomNo"] != null
+                                  ? subject["roomNo"]
+                                  : "",
+                              style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black54,
+                                  fontFamily: 'Geist',
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 5.0),
+                              child: Text(
+                                timeSlots[index],
+                                style: const TextStyle(
+                                    color: Color.fromRGBO(0, 0, 0, 0.63),
+                                    fontSize: 10,
+                                    fontFamily: 'Geist',
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  selectedDay = selectedDay > 1 ? selectedDay - 1 : 5;
+                });
+              },
+              icon: const Icon(Icons.arrow_back_ios),
+              color: Colors.white,
+              iconSize: 15,
+            ),
+            Text(
+              'Day $selectedDay',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontFamily: 'Geist',
+                fontWeight: FontWeight.w600,
               ),
-            ],
-          );
-        },
-      ),
+            ),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  selectedDay = selectedDay < 5 ? selectedDay + 1 : 1;
+                });
+              },
+              icon: const Icon(Icons.arrow_forward_ios),
+              color: Colors.white,
+              iconSize: 15,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

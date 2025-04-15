@@ -37,18 +37,18 @@ class _LoadingScreenState extends State<LoadingScreen>
   }
 
   Future<void> _checkAuthToken(BuildContext context) async {
-    String? csrfToken = await secureStorage.read(key: 'X-CSRF-TOKEN');
+  String? csrfToken = await secureStorage.read(key: 'X-CSRF-TOKEN');
 
-    if (csrfToken != null && csrfToken.isNotEmpty) {
-      try {
-        await (await ApiService.create()).validateToken(context);
-      } catch (e) {
-        _navigateToLogin(context);
-      }
-    } else {
+  if (csrfToken != null && csrfToken.isNotEmpty) {  
+    try {
+      await (await ApiService.create()).validateToken(context);
+    } catch (e) {
       _navigateToLogin(context);
     }
+  } else {
+    _navigateToLogin(context);
   }
+}
 
   void _navigateToLogin(BuildContext context) {
     Navigator.pushReplacementNamed(context, '/login');

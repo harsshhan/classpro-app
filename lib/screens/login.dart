@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../constants.dart';
+import '../styles.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -33,7 +33,7 @@ class _LoginState extends State<Login> {
       if (response.statusCode == 200 &&
           response.data['authenticated'] == true) {
         String? token = response.data['cookies'];
-        if (token != null && token.isNotEmpty) {
+        if (token!.isNotEmpty) {
           await secureStorage.write(key: 'X-CSRF-TOKEN', value: token);
           return true;
         } else {
