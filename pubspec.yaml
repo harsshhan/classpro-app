@@ -2,7 +2,7 @@ name: classpro
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -41,6 +41,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   url_launcher: ^6.2.5
   android_intent_plus: ^4.0.0
+  dotted_border: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -56,20 +57,28 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
-
-
 # The following section is specific to Flutter packages.
 flutter:
   fonts:
-    - family: geist-sans
+    - family: Geist
       fonts:
-        - asset: assets/fonts/geist-sans-latin-500-normal.ttf
-          weight: 500
-        - asset: assets/fonts/geist-sans-latin-400-normal.ttf
-          weight: 400
-        - asset: assets/fonts/geist-sans-latin-700-normal.ttf
+        - asset: assets/fonts/Geist-Regular.ttf
+        - asset: assets/fonts/Geist-Bold.ttf
           weight: 700
-
+        - asset: assets/fonts/Geist-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Geist-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Geist-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Geist-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Geist-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Geist-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Geist-Thin.ttf
+          weight: 100
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
