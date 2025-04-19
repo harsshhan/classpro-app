@@ -99,6 +99,7 @@ class _MarksState extends State<Marks> {
   Widget buildCourseCard(dynamic course) {
     final String subjectName = course['courseName'];
     final String courseType = course['courseType'];
+    final isTheory = courseType == 'Theory';
     final overall = course['overall'];
     final testPerformance = course['testPerformance'];
 
@@ -130,12 +131,12 @@ class _MarksState extends State<Marks> {
               ),
               CircleAvatar(
                 backgroundColor:
-                    courseType == 'Theory' ? Colors.yellow : Colors.green,
-                radius: 15,
+                    isTheory ? AppColors.warnBackground : AppColors.successBackground,
+                radius: 12,
                 child: Text(
                   courseType == 'Theory' ? 'T' : 'P',
-                  style: const TextStyle(
-                    color: Colors.black,
+                  style: TextStyle(
+                    color: isTheory ? AppColors.warnColor : AppColors.successColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),

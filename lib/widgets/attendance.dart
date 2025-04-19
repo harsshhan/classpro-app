@@ -59,6 +59,7 @@ class _AttendanceState extends State<Attendance> {
 
   Widget _buildAttendanceCard(dynamic course, bool isEvenIndex) {
     final category = course['category'];
+    final isTheory = category == 'Theory';
     Color backgroundColor =
         isEvenIndex ? const Color.fromRGBO(25, 28, 32, 1) : AppColors.bgColor;
 
@@ -91,12 +92,12 @@ class _AttendanceState extends State<Attendance> {
                   children: [
                     CircleAvatar(
                       backgroundColor:
-                          category == 'Theory' ? Colors.yellow : Colors.green,
+                          isTheory ? AppColors.warnBackground : AppColors.successBackground,
                       radius: 12,
                       child: Text(
                         category == 'Theory' ? 'T' : 'P',
-                        style: const TextStyle(
-                          color: Colors.black,
+                        style:  TextStyle(
+                            color: isTheory ? AppColors.warnColor : AppColors.successColor,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -114,15 +115,26 @@ class _AttendanceState extends State<Attendance> {
                     ),
                   ],
                 ),
-                Text(
-                  "${calculateMargin(hoursPresent, int.parse(course['hoursConducted'])) >= 0 ? 'Margin: ' : 'Required: '}"
-                  "${calculateMargin(hoursPresent, int.parse(course['hoursConducted'])).abs()}",
-                  style: calculateMargin(hoursPresent,
-                              int.parse(course['hoursConducted'])) >=
-                          0
-                      ? TextStyles.margin
-                      : TextStyles.required,
-                ),
+                RichText(
+  text: TextSpan(
+    children: [
+      TextSpan(
+        text: calculateMargin(hoursPresent, int.parse(course['hoursConducted'])) >= 0
+            ? 'Margin: '
+            : 'Required: ',
+        style: calculateMargin(hoursPresent, int.parse(course['hoursConducted'])) >= 0
+            ? TextStyles.margin // Define this with a color like green
+            : TextStyles.required, // Define this with a color like red
+      ),
+      TextSpan(
+        text: '${calculateMargin(hoursPresent, int.parse(course['hoursConducted'])).abs()}',
+        style: calculateMargin(hoursPresent, int.parse(course['hoursConducted'])) >= 0
+            ? TextStyles.marginValue // Maybe bold green
+            : TextStyles.requiredValue, // Maybe bold red
+      ),
+    ],
+  ),
+)
               ],
             ),
             const SizedBox(height: 16),

@@ -1,4 +1,5 @@
 import 'package:classpro/api/service.dart';
+import 'package:classpro/styles.dart';
 import 'package:flutter/material.dart';
 
 class Timetable extends StatefulWidget {
@@ -125,8 +126,8 @@ class _TimetableState extends State<Timetable> {
                     decoration: BoxDecoration(
                       color: subject != null
                           ? (isPractical
-                              ? const Color.fromRGBO(151, 223, 113, 1)
-                              : const Color.fromRGBO(235, 215, 112, 1))
+                              ? AppColors.practical
+                              : AppColors.theory)
                           : const Color.fromRGBO(63, 90, 50, 1),
                       borderRadius: borderRadius,
                     ),
@@ -146,7 +147,7 @@ class _TimetableState extends State<Timetable> {
                                 fontFamily: 'Geist',
                                 fontSize: 10,
                                 color: subject != null
-                                    ? Colors.black87
+                                    ? Colors.black
                                     : Colors.green[900],
                               ),
                             ),
