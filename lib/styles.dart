@@ -55,6 +55,12 @@ class AppColors {
 
   static const infoBackground = Color.fromRGBO(27, 29, 43, 1);
   static const infoColor = Color.fromRGBO(124, 179, 235, 1);
+
+  static const errorBackground = Color.fromRGBO(29, 12, 12, 1);
+  static const errorColor = Color.fromRGBO(247, 91, 91, 1);
+
+  static const totBackground = Color.fromRGBO(207, 208, 209, 1);
+  static const totColor = Color.fromRGBO(6, 9, 13, 1);
   
   // static const marginColor = Color.fromRGBO(179, 179, 298, 1);
 

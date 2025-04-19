@@ -25,7 +25,7 @@
     <application
         android:label="classpro"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/classpro_logo">
 
         <activity
             android:name=".MainActivity"

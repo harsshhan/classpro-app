@@ -68,7 +68,7 @@ class _AttendanceState extends State<Attendance> {
     final double percentage = double.parse(course['attendancePercentage']);
 
     Color percentageColor =
-        percentage >= 75 ? const Color(0xFF4CAF50) : Colors.red;
+        percentage >= 75 ? Colors.white : Colors.red;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8.0),
@@ -91,13 +91,16 @@ class _AttendanceState extends State<Attendance> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CircleAvatar(
-                      backgroundColor:
-                          isTheory ? AppColors.warnBackground : AppColors.successBackground,
+                      backgroundColor: isTheory
+                          ? AppColors.warnBackground
+                          : AppColors.successBackground,
                       radius: 12,
                       child: Text(
                         category == 'Theory' ? 'T' : 'P',
-                        style:  TextStyle(
-                            color: isTheory ? AppColors.warnColor : AppColors.successColor,
+                        style: TextStyle(
+                          color: isTheory
+                              ? AppColors.warnColor
+                              : AppColors.successColor,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -116,25 +119,34 @@ class _AttendanceState extends State<Attendance> {
                   ],
                 ),
                 RichText(
-  text: TextSpan(
-    children: [
-      TextSpan(
-        text: calculateMargin(hoursPresent, int.parse(course['hoursConducted'])) >= 0
-            ? 'Margin: '
-            : 'Required: ',
-        style: calculateMargin(hoursPresent, int.parse(course['hoursConducted'])) >= 0
-            ? TextStyles.margin // Define this with a color like green
-            : TextStyles.required, // Define this with a color like red
-      ),
-      TextSpan(
-        text: '${calculateMargin(hoursPresent, int.parse(course['hoursConducted'])).abs()}',
-        style: calculateMargin(hoursPresent, int.parse(course['hoursConducted'])) >= 0
-            ? TextStyles.marginValue // Maybe bold green
-            : TextStyles.requiredValue, // Maybe bold red
-      ),
-    ],
-  ),
-)
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: calculateMargin(hoursPresent,
+                                    int.parse(course['hoursConducted'])) >=
+                                0
+                            ? 'Margin: '
+                            : 'Required: ',
+                        style: calculateMargin(hoursPresent,
+                                    int.parse(course['hoursConducted'])) >=
+                                0
+                            ? TextStyles
+                                .margin // Define this with a color like green
+                            : TextStyles
+                                .required, // Define this with a color like red
+                      ),
+                      TextSpan(
+                        text:
+                            '${calculateMargin(hoursPresent, int.parse(course['hoursConducted'])).abs()}',
+                        style: calculateMargin(hoursPresent,
+                                    int.parse(course['hoursConducted'])) >=
+                                0
+                            ? TextStyles.marginValue // Maybe bold green
+                            : TextStyles.requiredValue, // Maybe bold red
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
             const SizedBox(height: 16),
@@ -144,29 +156,48 @@ class _AttendanceState extends State<Attendance> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E),
                         borderRadius: BorderRadius.circular(16),
+                        color: Colors.transparent,
                       ),
                       child: Row(
                         children: [
-                          Text(
-                            hoursPresent.toString(),
-                            style: const TextStyle(
-                              color: Color(0xFF4CAF50),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: const BoxDecoration(
+                              color: AppColors.successBackground,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(16),
+                                bottomLeft: Radius.circular(16),
+                              ),
+                            ),
+                            child: Text(
+                              hoursPresent.toString(),
+                              style: const TextStyle(
+                                color: AppColors.successColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            course['hoursAbsent'],
-                            style: const TextStyle(
-                              color: Color(0xFFF44336),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: const BoxDecoration(
+                              color: AppColors.errorBackground,
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(16),
+                                bottomRight: Radius.circular(16),
+                              ),
+                            ),
+                            child: Text(
+                              course['hoursAbsent'],
+                              style: const TextStyle(
+                                color: AppColors.errorColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
                             ),
                           ),
                         ],
@@ -178,13 +209,13 @@ class _AttendanceState extends State<Attendance> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF303030),
+                        color: AppColors.totBackground,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
                         course['hoursConducted'],
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.totColor,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),

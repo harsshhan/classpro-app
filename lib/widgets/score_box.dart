@@ -1,3 +1,4 @@
+import 'package:classpro/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
 
@@ -26,7 +27,7 @@ class ScoreBox extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: isTotal
-            ? const Color(0xFFE0E0E0)
+            ? AppColors.totBackground
             : const Color.fromRGBO(9, 11, 17, 1),
         borderRadius: BorderRadius.circular(20),
         border: isPerfectScore && !isTotal
@@ -58,7 +59,7 @@ class ScoreBox extends StatelessWidget {
   }
 
   Color _getTextColor() {
-    if (isTotal) return Colors.black;
+    if (isTotal) return AppColors.totColor;
     if (isPerfectScore) return Colors.green;
     if (score == 'Abs' || isLessThanHalf) return Colors.red;
     return Colors.white;

@@ -194,7 +194,7 @@ class _HomeState extends State<Home> {
                             fontSize: 14,
                           ),
                         ),
-                        InkWell(
+                        GestureDetector(
                           onTap: () async {
                             const url =
                                 'https://www.linkedin.com/in/harshan-am';
@@ -206,9 +206,9 @@ class _HomeState extends State<Home> {
                                   data: url,
                                 );
                                 await intent.launch();
-                                print("Launched with intent");
+
                               } catch (e) {
-                                print("Intent launch error: $e");
+                                  null;
                               }
                             } else {
                               // For iOS devices
@@ -223,7 +223,7 @@ class _HomeState extends State<Home> {
                             style: TextStyle(
                                 color: Colors.grey.shade600,
                                 fontSize: 14,
-                                decoration: TextDecoration.overline),
+                                decoration: TextDecoration.underline),
                           ),
                         )
                       ],
