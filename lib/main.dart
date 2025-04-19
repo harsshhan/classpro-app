@@ -1,13 +1,25 @@
+import 'package:classpro/provider/user_provider.dart';
+import 'package:classpro/screens/home.dart';
 import 'package:classpro/screens/loading_screen.dart';
 import 'package:classpro/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
+
+import 'screens/gradex.dart';
 
 Future<void> main() async {
+  
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+  
 
-  runApp(const MyApp());
+  runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: const MyApp(),
+    ),);
 }
 
 class MyApp extends StatelessWidget {
@@ -24,7 +36,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoadingScreen(),
         '/login': (context) => Login(),
-        // '/home': (context) =>  Home(),
+        '/gradex': (context) => GradexPage(),
+        '/home': (context) =>  Home(),
       },
       initialRoute: '/',
     );

@@ -159,7 +159,7 @@ class _LoginState extends State<Login> {
 
                           if (isLoggedIn) {
                             ApiService apiService = await ApiService.create();
-                            await apiService.validateToken(context);
+                            await apiService.validateToken();
 
                           } else {
                             _showSnackbar(

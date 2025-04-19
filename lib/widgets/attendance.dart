@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../api/service.dart';
+import '../provider/user_provider.dart';
 import '../styles.dart';
 
 class Attendance extends StatefulWidget {
@@ -11,16 +12,9 @@ class Attendance extends StatefulWidget {
 }
 
 class _AttendanceState extends State<Attendance> {
-  late List<dynamic> attendanceData = [];
   late String regNumber = '';
   bool isLoading = true;
   String errorMessage = '';
-
-  @override
-  void initState() {
-    super.initState();
-    fetchAttendanceData();
-  }
 
   int calculateMargin(int present, int total) {
     const int pMin = 75;
@@ -40,23 +34,6 @@ class _AttendanceState extends State<Attendance> {
     return -requiredClassesToAttend;
   }
 
-  Future<void> fetchAttendanceData() async {
-    try {
-      final Map<String, dynamic> parsedData =
-          await (await ApiService.create()).getAttendance();
-      setState(() {
-        regNumber = parsedData['regNumber'] ?? '';
-        attendanceData = parsedData['attendance'] ?? [];
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-        errorMessage = 'Error fetching data: $e';
-      });
-    }
-  }
-
   Widget _buildAttendanceCard(dynamic course, bool isEvenIndex) {
     final category = course['category'];
     final isTheory = category == 'Theory';
@@ -67,8 +44,7 @@ class _AttendanceState extends State<Attendance> {
         int.parse(course['hoursConducted']) - int.parse(course['hoursAbsent']);
     final double percentage = double.parse(course['attendancePercentage']);
 
-    Color percentageColor =
-        percentage >= 75 ? Colors.white : Colors.red;
+    Color percentageColor = percentage >= 75 ? Colors.white : Colors.red;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8.0),
@@ -82,13 +58,12 @@ class _AttendanceState extends State<Attendance> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Course title row
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CircleAvatar(
                       backgroundColor: isTheory
@@ -96,7 +71,7 @@ class _AttendanceState extends State<Attendance> {
                           : AppColors.successBackground,
                       radius: 12,
                       child: Text(
-                        category == 'Theory' ? 'T' : 'P',
+                        isTheory ? 'T' : 'P',
                         style: TextStyle(
                           color: isTheory
                               ? AppColors.warnColor
@@ -130,10 +105,8 @@ class _AttendanceState extends State<Attendance> {
                         style: calculateMargin(hoursPresent,
                                     int.parse(course['hoursConducted'])) >=
                                 0
-                            ? TextStyles
-                                .margin // Define this with a color like green
-                            : TextStyles
-                                .required, // Define this with a color like red
+                            ? TextStyles.margin
+                            : TextStyles.required,
                       ),
                       TextSpan(
                         text:
@@ -141,8 +114,8 @@ class _AttendanceState extends State<Attendance> {
                         style: calculateMargin(hoursPresent,
                                     int.parse(course['hoursConducted'])) >=
                                 0
-                            ? TextStyles.marginValue // Maybe bold green
-                            : TextStyles.requiredValue, // Maybe bold red
+                            ? TextStyles.marginValue
+                            : TextStyles.requiredValue,
                       ),
                     ],
                   ),
@@ -150,16 +123,15 @@ class _AttendanceState extends State<Attendance> {
               ],
             ),
             const SizedBox(height: 16),
+
+            // Present, Absent, Total and % row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
+                    // Present / Absent
                     Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: Colors.transparent,
-                      ),
                       child: Row(
                         children: [
                           Container(
@@ -204,8 +176,8 @@ class _AttendanceState extends State<Attendance> {
                       ),
                     ),
                     const SizedBox(width: 10),
+                    // Total
                     Container(
-                      margin: EdgeInsets.zero,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
@@ -241,11 +213,14 @@ class _AttendanceState extends State<Attendance> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final isLoading = userProvider.isLoading;
+    final attendanceData = userProvider.attendanceData;
+
+
     if (isLoading) {
       return const Center(
-        child: CircularProgressIndicator(
-          color: Colors.orange,
-        ),
+        child: CircularProgressIndicator(color: Colors.orange),
       );
     }
 
@@ -267,7 +242,8 @@ class _AttendanceState extends State<Attendance> {
       );
     }
 
-    final List<dynamic> theoryCourses = attendanceData
+    final List<dynamic> attendanceList = attendanceData['attendance'] ?? [];
+    final List<dynamic> theoryCourses = attendanceList
         .where((course) => course['category'] == 'Theory')
         .toList()
       ..sort((a, b) {
@@ -279,13 +255,10 @@ class _AttendanceState extends State<Attendance> {
             calculateMargin(aPresent, int.parse(a['hoursConducted'])) < 0;
         final bRequired =
             calculateMargin(bPresent, int.parse(b['hoursConducted'])) < 0;
-        if (aRequired != bRequired) {
-          return aRequired ? -1 : 1;
-        }
-        return 0;
+        return aRequired != bRequired ? (aRequired ? -1 : 1) : 0;
       });
 
-    final List<dynamic> practicalCourses = attendanceData
+    final List<dynamic> practicalCourses = attendanceList
         .where((course) => course['category'] == 'Practical')
         .toList()
       ..sort((a, b) {
@@ -297,10 +270,7 @@ class _AttendanceState extends State<Attendance> {
             calculateMargin(aPresent, int.parse(a['hoursConducted'])) < 0;
         final bRequired =
             calculateMargin(bPresent, int.parse(b['hoursConducted'])) < 0;
-        if (aRequired != bRequired) {
-          return aRequired ? -1 : 1;
-        }
-        return 0;
+        return aRequired != bRequired ? (aRequired ? -1 : 1) : 0;
       });
 
     return ListView(

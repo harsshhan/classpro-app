@@ -1,14 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../screens/home.dart';
 
 const FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
 class ApiService {
   final String apiUrl = dotenv.env['API_URL']!;
-
   late final Dio _dio;
 
   ApiService._(this._dio);
@@ -30,13 +27,35 @@ class ApiService {
     return ApiService._(dio);
   }
 
+  Future<Map<String, dynamic>> validateToken() async {
+    try {
+      String? csrfToken = await secureStorage.read(key: 'X-CSRF-TOKEN');
+      final response = await _dio.get(
+        '/user',
+        options: Options(
+          headers: {
+            'X-CSRF-Token': csrfToken,
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        return response.data;
+      } else {
+        throw Exception('Token invalid');
+      }
+    } catch (e) {
+      throw Exception('Token validation failed');
+    }
+  }
+
   Future<Map<String, dynamic>> getAttendance() async {
     try {
       final response = await _dio.get('/attendance');
       return response.data;
     } catch (e) {
-  throw Exception('Failed to fetch timetable');
-}
+      throw Exception('Failed to fetch attendance');
+    }
   }
 
   Future<Map<String, dynamic>> getMarks() async {
@@ -44,8 +63,7 @@ class ApiService {
       final response = await _dio.get('/marks');
       return response.data;
     } catch (e) {
-      print('Error fetching marks: $e');
-      return {};
+      throw Exception('Failed to fetch marks');
     }
   }
 
@@ -54,8 +72,7 @@ class ApiService {
       final response = await _dio.get('/timetable');
       return response.data;
     } catch (e) {
-      print('Error fetching timetable: $e');
-      return {};
+      throw Exception('Failed to fetch timetable');
     }
   }
 
@@ -73,56 +90,15 @@ class ApiService {
           response.data['authenticated'] == true) {
         String? cookies = response.data['cookies'];
         await secureStorage.write(key: 'X-CSRF-TOKEN', value: cookies);
-        print('CSRF token stored securely.');
       } else {
-        print('Unexpected login response: ${response.statusCode}');
+        throw Exception('Login failed');
       }
     } catch (e) {
-      print('Error logging in: $e');
+      throw Exception('Error logging in: $e');
     }
   }
 
-  Future<void> logout(BuildContext context) async {
+  Future<void> logout() async {
     await secureStorage.delete(key: 'X-CSRF-TOKEN');
-    Navigator.pushReplacementNamed(context, '/login');
-  }
-
-  Future<bool> validateToken(
-    BuildContext context,
-  ) async {
-    try {
-      String? csrfToken = await secureStorage.read(key: 'X-CSRF-TOKEN');
-      final response = await _dio.get(
-        '/user',
-        options: Options(
-          headers: {
-            'X-CSRF-Token': csrfToken,
-          },
-        ),
-      );
-
-      if (response.statusCode == 200 && response.data != null) {
-        Map<String, dynamic> userData = response.data;
-
-        if (userData.isNotEmpty) {
-          if (context.mounted) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Home(userDataList: userData),
-              ),
-              (Route<dynamic> route) => false,
-            );
-          }
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } catch (e) {
-      return false;
-    }
   }
 }

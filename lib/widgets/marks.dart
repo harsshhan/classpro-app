@@ -1,4 +1,6 @@
+import 'package:classpro/provider/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../api/service.dart';
 import '../styles.dart';
 import 'score_box.dart';
@@ -11,36 +13,19 @@ class Marks extends StatefulWidget {
 }
 
 class _MarksState extends State<Marks> {
-  late List<dynamic> marksData = [];
-  late String regNumber = '';
   bool isLoading = true;
   String errorMessage = '';
 
-  @override
-  void initState() {
-    super.initState();
-    fetchMarksData();
-  }
-
-  Future<void> fetchMarksData() async {
-    try {
-      final Map<String, dynamic> parsedData =
-          await (await ApiService.create()).getMarks();
-      setState(() {
-        regNumber = parsedData['regNumber'] ?? '';
-        marksData = parsedData['marks'] ?? [];
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-        errorMessage = 'Error fetching data: $e';
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final storedMarksData = userProvider.marksData;
+    
+    final isLoading = userProvider.isLoading;
+
+    final List<dynamic> marks = storedMarksData['marks'] ?? [];
+
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -55,10 +40,9 @@ class _MarksState extends State<Marks> {
     }
 
     final List<dynamic> theoryCourses =
-        marksData.where((course) => course['courseType'] == 'Theory').toList();
-    final List<dynamic> practicalCourses = marksData
-        .where((course) => course['courseType'] == 'Practical')
-        .toList();
+        marks.where((course) => course['courseType'] == 'Theory').toList();
+    final List<dynamic> practicalCourses =
+        marks.where((course) => course['courseType'] == 'Practical').toList();
 
     return ListView(
       shrinkWrap: true,
@@ -97,108 +81,103 @@ class _MarksState extends State<Marks> {
   }
 
   Widget buildCourseCard(dynamic course) {
-  final String subjectName = course['courseName'];
-  final String courseType = course['courseType'];
-  final isTheory = courseType == 'Theory';
-  final overall = course['overall'];
-  final testPerformance = course['testPerformance'];
+    final String subjectName = course['courseName'];
+    final String courseType = course['courseType'];
+    final isTheory = courseType == 'Theory';
+    final overall = course['overall'];
+    final testPerformance = course['testPerformance'];
 
-  return Container(
-    margin: const EdgeInsets.only(top: 5, bottom: 5),
-    padding: const EdgeInsets.all(15),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(20),
-      color: const Color.fromRGBO(25, 28, 32, 1),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
-              child: Text(
-                subjectName,
-                style: TextStyles.courseName,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
-            ),
-            CircleAvatar(
-              backgroundColor: isTheory
-                  ? AppColors.warnBackground
-                  : AppColors.successBackground,
-              radius: 12,
-              child: Text(
-                courseType == 'Theory' ? 'T' : 'P',
-                style: TextStyle(
-                  color: isTheory
-                      ? AppColors.warnColor
-                      : AppColors.successColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+    return Container(
+      margin: const EdgeInsets.only(top: 5, bottom: 5),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: const Color.fromRGBO(25, 28, 32, 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.7,
+                child: Text(
+                  subjectName,
+                  style: TextStyles.courseName,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
+              CircleAvatar(
+                backgroundColor: isTheory
+                    ? AppColors.warnBackground
+                    : AppColors.successBackground,
+                radius: 12,
+                child: Text(
+                  courseType == 'Theory' ? 'T' : 'P',
+                  style: TextStyle(
+                    color:
+                        isTheory ? AppColors.warnColor : AppColors.successColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          if (testPerformance != null)
+            ...testPerformance.map((test) {
+              final testName = test['test'];
+              final testMarks = test['marks'];
+              final scored = testMarks['scored'];
+              final total = testMarks['total'];
 
-        if (testPerformance != null)
-          ...testPerformance.map((test) {
-            final testName = test['test'];
-            final testMarks = test['marks'];
-            final scored = testMarks['scored'];
-            final total = testMarks['total'];
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    testName,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 16,
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      testName,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                  ScoreBoxPair(
-                    scored: scored,
-                    total: total,
-                  ),
-                ],
+                    ScoreBoxPair(
+                      scored: scored,
+                      total: total,
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          Divider(
+            color: Colors.grey.shade600,
+            thickness: 1,
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Total',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            );
-          }).toList(),
-
-        Divider(
-          color: Colors.grey.shade600,
-          thickness: 1,
-        ),
-        const SizedBox(height: 10),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Total',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              ScoreBoxPair(
+                scored: overall['scored'],
+                total: overall['total'],
               ),
-            ),
-            ScoreBoxPair(
-              scored: overall['scored'],
-              total: overall['total'],
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
+            ],
+          ),
+        ],
+      ),
+    );
   }
-
+}

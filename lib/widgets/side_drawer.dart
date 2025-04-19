@@ -1,18 +1,35 @@
 import 'dart:ui';
 
+import 'package:classpro/provider/user_provider.dart';
 import 'package:classpro/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../api/service.dart';
 
-class CustomDrawer extends StatelessWidget {
-  final Map<String, dynamic> userDataList;
+class CustomDrawer extends StatefulWidget {
   final String currentRoute;
 
-  const CustomDrawer({super.key, required this.userDataList, required this.currentRoute});
+  const CustomDrawer({super.key,required this.currentRoute});
+
+  @override
+  State<CustomDrawer> createState() => _CustomDrawerState();
+}
+
+class _CustomDrawerState extends State<CustomDrawer> {
+  late Map<String, dynamic> userDataList;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      userDataList = Provider.of<UserProvider>(context, listen: false).userData;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final userDataList = Provider.of<UserProvider>(context).userData;
     return Drawer(
       backgroundColor: AppColors.bgColor,
       child: Column(
@@ -20,7 +37,7 @@ class CustomDrawer extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: SizedBox(
-              height: 120,
+              height: 80,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Column(
@@ -37,17 +54,6 @@ class CustomDrawer extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.redAccent,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        'Holiday',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -58,8 +64,8 @@ class CustomDrawer extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 15),
               children: [
                 Divider(color: Colors.grey.shade600),
-                _buildDrawerItem('Home', 'assets/icons/book_logo.png', context, '/home', isSelected: currentRoute == '/home'),
-                _buildDrawerItem('SGPA Calculator', 'assets/icons/gradex_icon.png', context, '/gradex', isSelected: currentRoute == '/gradex'),
+                _buildDrawerItem('Home', 'assets/icons/book_logo.png', context, '/home', isSelected: widget.currentRoute == '/home'),
+                _buildDrawerItem('SGPA Calculator', 'assets/icons/gradex_icon.png', context, '/gradex', isSelected: widget.currentRoute == '/gradex'),
               ],
             ),
           ),
@@ -115,8 +121,8 @@ class CustomDrawer extends StatelessWidget {
 
   Widget _buildDrawerItem(String title, String iconPath, BuildContext context, String route, {bool isSelected = false}) {
     return ListTile(
-      leading: Image.asset(iconPath, width: 24, color: isSelected ? Colors.white : Colors.grey),
-      title: Text(title, style: TextStyle(color: isSelected ? Colors.white : Colors.grey)),
+      trailing: Image.asset(iconPath, width: 24, color: isSelected ? Colors.white : Colors.grey),
+      title: Text(title, style: TextStyle(color: isSelected ? Colors.white : Colors.grey,fontWeight: FontWeight.bold,fontSize: 18)),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       tileColor: isSelected ? Colors.white.withOpacity(0.1) : Colors.transparent,
       onTap: () {
@@ -272,7 +278,7 @@ class CustomDrawer extends StatelessWidget {
                   InkWell(
                     onTap: () async {
                       ApiService apiService = await ApiService.create();
-                      await apiService.logout(context);
+                      await apiService.logout();
                     },
                     child: Container(
                       width: double.infinity,

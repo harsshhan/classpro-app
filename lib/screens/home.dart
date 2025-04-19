@@ -1,4 +1,5 @@
 import 'package:android_intent_plus/android_intent.dart' as android_intent;
+import 'package:classpro/provider/user_provider.dart';
 import 'dart:io' show Platform;
 import 'package:classpro/widgets/attendance.dart';
 import 'package:classpro/widgets/marks.dart';
@@ -10,14 +11,14 @@ import 'package:url_launcher/url_launcher.dart';
 import '../styles.dart';
 
 class Home extends StatefulWidget {
-  final Map<String, dynamic> userDataList;
-  const Home({super.key, required this.userDataList});
+  const Home({super.key});
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,7 +27,9 @@ class _HomeState extends State<Home> {
         child: Scaffold(
           drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.5,
           backgroundColor: AppColors.bgColor,
-          drawer:  CustomDrawer(userDataList: widget.userDataList,currentRoute: '/home',),
+          drawer: CustomDrawer(
+            currentRoute: '/home',
+          ),
           body: Padding(
             padding: const EdgeInsets.all(18),
             child: SingleChildScrollView(
@@ -55,7 +58,6 @@ class _HomeState extends State<Home> {
                   ),
                   const Timetable(),
                   const SizedBox(height: 20),
-                  
                   const Attendance(),
                   const SizedBox(height: 20),
                   const Text(
@@ -92,9 +94,8 @@ class _HomeState extends State<Home> {
                                   data: url,
                                 );
                                 await intent.launch();
-
                               } catch (e) {
-                                  null;
+                                null;
                               }
                             } else {
                               // For iOS devices
