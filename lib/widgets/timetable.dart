@@ -1,6 +1,11 @@
 import 'package:classpro/api/service.dart';
+import 'package:classpro/provider/user_provider.dart';
 import 'package:classpro/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+
+int globalTodayDayOrder = 1; 
 
 class Timetable extends StatefulWidget {
   const Timetable({super.key});
@@ -13,12 +18,19 @@ class _TimetableState extends State<Timetable> {
   List<dynamic> subjects = [];
   bool isLoading = true;
   String? errorMessage;
-  int selectedDay = 1;
+  int selectedDay = globalTodayDayOrder; 
+  bool isTodaySelected = false;
+
   Map<String, dynamic>? timetableData;
 
   @override
   void initState() {
     super.initState();
+    globalTodayDayOrder = int.tryParse(
+            Provider.of<UserProvider>(context, listen: false).todayDayOrder) ??
+        1; 
+    selectedDay = globalTodayDayOrder;
+    isTodaySelected = selectedDay == globalTodayDayOrder;
     _fetchTimetable();
   }
 
@@ -93,7 +105,6 @@ class _TimetableState extends State<Timetable> {
             physics: const NeverScrollableScrollPhysics(),
             itemCount: timeSlots.length,
             itemBuilder: (context, index) {
-              // Get subjects for current day from schedule
               final List<dynamic> daySubjects = timetableData?['schedule']
                       ?.firstWhere((day) => day['day'] == selectedDay,
                           orElse: () => {'table': []})['table'] ??
@@ -131,56 +142,54 @@ class _TimetableState extends State<Timetable> {
                           : const Color.fromRGBO(63, 90, 50, 1),
                       borderRadius: borderRadius,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              subject != null
-                                  ? (subject["name"] ?? "No Class")
-                                  : "No Class",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Geist',
-                                fontSize: 10,
-                                color: subject != null
-                                    ? Colors.black
-                                    : Colors.green[900],
-                              ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 8, bottom: 3, left: 3, right: 3),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            subject != null
+                                ? (subject["name"] ?? "No Class")
+                                : "No Class",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Geist',
+                              fontSize: 12,
+                              color: subject != null
+                                  ? Colors.black
+                                  : Colors.green[900],
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              subject != null && subject["roomNo"] != null
-                                  ? subject["roomNo"]
-                                  : "",
-                              style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.black54,
-                                  fontFamily: 'Geist',
-                                  fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 5.0),
-                              child: Text(
-                                timeSlots[index],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                subject != null && subject["roomNo"] != null
+                                    ? subject["roomNo"]
+                                    : "",
                                 style: const TextStyle(
-                                    color: Color.fromRGBO(0, 0, 0, 0.63),
-                                    fontSize: 10,
+                                    fontSize: 12,
+                                    color: Colors.black54,
                                     fontFamily: 'Geist',
                                     fontWeight: FontWeight.w600),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5.0),
+                                child: Text(
+                                  timeSlots[index],
+                                  style: const TextStyle(
+                                      color: Color.fromRGBO(0, 0, 0, 0.63),
+                                      fontSize: 10,
+                                      fontFamily: 'Geist',
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -196,16 +205,17 @@ class _TimetableState extends State<Timetable> {
               onPressed: () {
                 setState(() {
                   selectedDay = selectedDay > 1 ? selectedDay - 1 : 5;
+                  isTodaySelected = selectedDay == globalTodayDayOrder;
                 });
               },
               icon: const Icon(Icons.arrow_back_ios),
-              color: Colors.white,
+              color: AppColors.accentColor,
               iconSize: 15,
             ),
             Text(
               'Day $selectedDay',
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.accentColor,
                 fontSize: 15,
                 fontFamily: 'Geist',
                 fontWeight: FontWeight.w600,
@@ -215,12 +225,46 @@ class _TimetableState extends State<Timetable> {
               onPressed: () {
                 setState(() {
                   selectedDay = selectedDay < 5 ? selectedDay + 1 : 1;
+                  isTodaySelected = selectedDay == globalTodayDayOrder;
                 });
               },
               icon: const Icon(Icons.arrow_forward_ios),
-              color: Colors.white,
+              color: AppColors.accentColor,
               iconSize: 15,
             ),
+            SizedBox(
+              width: 10,
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedDay = globalTodayDayOrder;
+                  globalTodayDayOrder = selectedDay;
+                  isTodaySelected = true;
+                });
+              },
+              child: Container(
+                height: 30,
+                width: 75,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: isTodaySelected
+                        ? AppColors.successBackground
+                        : Color.fromRGBO(27, 29, 31, 1)),
+                child: Center(
+                  child: Text(
+                    "Today",
+                    style: TextStyle(
+                        color: isTodaySelected
+                            ? AppColors.successColor
+                            : Colors.white,
+                        fontSize: 14,
+                        fontFamily: 'Geist',
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ),
+            )
           ],
         ),
       ],

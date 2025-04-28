@@ -51,6 +51,8 @@ class _LoadingScreenState extends State<LoadingScreen>
     final marks = await api.getMarks();
     final attendance = await api.getAttendance();
     final timetable = await api.getTimetable();
+    final calendar = await api.getCalendar();
+    
 
 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -58,6 +60,7 @@ class _LoadingScreenState extends State<LoadingScreen>
     userProvider.setMarksData(marks);
     userProvider.setAttendanceData(attendance);
     userProvider.setTimetableData(timetable);
+    userProvider.setCalendarData(calendar);
 
     userProvider.setLoading(false);
 
@@ -79,7 +82,7 @@ class _LoadingScreenState extends State<LoadingScreen>
   }
 
   void _navigateToHome() {
-    Navigator.pushReplacementNamed(context, '/gradex');
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   @override

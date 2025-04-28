@@ -10,8 +10,12 @@ class UserProvider with ChangeNotifier {
   Map<String, dynamic> get userData => _userData;
   Map<String, dynamic> get marksData => _marksData;
   Map<String, dynamic> get attendanceData => _attendanceData;
-  List<dynamic> get attendanceList => _attendanceData['attendance'] ?? []; 
+  List<dynamic> get attendanceList => _attendanceData['attendance'] ?? [];
   Map<String, dynamic> get timetableData => _timetableData;
+  Map<String, dynamic> _calendarData = {};
+  Map<String, dynamic> get calendarData => _calendarData;
+  String get todayDayOrder => _calendarData['today']?['dayOrder'] ?? '';
+  String get tomorrowDayOrder => _calendarData['tomorrow']?['dayOrder'] ?? '';
   bool get isLoading => _isLoading;
 
   void setUserData(Map<String, dynamic> data) {
@@ -24,7 +28,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setAttendanceData(Map<String, dynamic> data) { 
+  void setAttendanceData(Map<String, dynamic> data) {
     _attendanceData = data;
     notifyListeners();
   }
@@ -33,8 +37,14 @@ class UserProvider with ChangeNotifier {
     _timetableData = data;
     notifyListeners();
   }
+
   void setLoading(bool value) {
     _isLoading = value;
+    notifyListeners();
+  }
+
+  void setCalendarData(Map<String, dynamic> data) {
+    _calendarData = data;
     notifyListeners();
   }
 }

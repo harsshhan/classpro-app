@@ -21,10 +21,10 @@ class TextStyles {
     fontWeight: FontWeight.w500,
     color: Color.fromRGBO(179, 179, 209, 40)
   );
-  static const TextStyle required = TextStyle(
+  static  TextStyle required = TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.w500,
-    color: Colors.red
+    color: AppColors.errorColor.withValues(alpha: 0.5),
   );
   static const marginValue = TextStyle(
   color: AppColors.infoColor,
@@ -32,7 +32,7 @@ class TextStyles {
   fontSize: 15,
 );
   static const requiredValue = TextStyle(
-  color: Colors.red,
+  color: AppColors.errorColor,
   fontWeight: FontWeight.bold,
   fontSize: 15,
 );
@@ -45,6 +45,10 @@ class AppColors {
   static const Color darkTransparent = Color.fromRGBO(10, 12, 16, 0); 
   static const Color bgColor = Color.fromRGBO(9, 11, 17, 1);
   static const Color tot_marks_bgColor = Color.fromRGBO(204, 204, 205, 1);
+
+
+  static const backgroundDark = Color.fromRGBO(6,9,13,1);
+
   static const theory = Color.fromRGBO(242, 216, 105, 1);
   static const practical = Color.fromRGBO(105, 224, 105, 1);
   static const warnBackground = Color.fromRGBO(43, 40, 31, 1);
@@ -61,8 +65,14 @@ class AppColors {
 
   static const totBackground = Color.fromRGBO(207, 208, 209, 1);
   static const totColor = Color.fromRGBO(6, 9, 13, 1);
+
+  static const backgroundNormal = Color.fromRGBO(17 ,21 ,27,1);
+
+  static const accentColor = Color.fromRGBO(179,179,209,1);
+
+
   
-  // static const marginColor = Color.fromRGBO(179, 179, 298, 1);
+ 
 
 
 
