@@ -1,11 +1,10 @@
-import 'package:classpro/api/service.dart';
+import 'package:classpro/services/api_service.dart';
 import 'package:classpro/provider/user_provider.dart';
 import 'package:classpro/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
-int globalTodayDayOrder = 1; 
+int? globalTodayDayOrder = 1;
 
 class Timetable extends StatefulWidget {
   const Timetable({super.key});
@@ -18,51 +17,29 @@ class _TimetableState extends State<Timetable> {
   List<dynamic> subjects = [];
   bool isLoading = true;
   String? errorMessage;
-  int selectedDay = globalTodayDayOrder; 
-  bool isTodaySelected = false;
+  int? selectedDay = globalTodayDayOrder;
+  bool isTodaySelected = true;
 
   Map<String, dynamic>? timetableData;
 
   @override
   void initState() {
     super.initState();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    timetableData = userProvider.timetableData;
     globalTodayDayOrder = int.tryParse(
-            Provider.of<UserProvider>(context, listen: false).todayDayOrder) ??
-        1; 
+        Provider.of<UserProvider>(context, listen: false).todayDayOrder);
     selectedDay = globalTodayDayOrder;
     isTodaySelected = selectedDay == globalTodayDayOrder;
-    _fetchTimetable();
+    print(timetableData);
+    isLoading = false;
   }
 
-  Future<void> _fetchTimetable() async {
-    try {
-      final Map<String, dynamic> data =
-          await (await ApiService.create()).getTimetable();
-
-      if (data.containsKey("schedule") && data["schedule"] != null) {
-        final List<dynamic> schedule = data["schedule"];
-
-        if (schedule.isNotEmpty && schedule[0]["table"] != null) {
-          setState(() {
-            subjects = schedule[0]["table"];
-            timetableData = data;
-            isLoading = false;
-          });
-        } else {
-          setState(() {
-            errorMessage = "No timetable data available.";
-            isLoading = false;
-          });
-        }
-      } else {
-        throw Exception("Invalid or null data received.");
-      }
-    } catch (e) {
-      setState(() {
-        errorMessage = "Error fetching timetable: $e";
-        isLoading = false;
-      });
-    }
+  List<dynamic> getSubjectsForDay(int? day) {
+    if (day == null || timetableData == null) return [];
+    final dayData = timetableData!['schedule']
+        ?.firstWhere((d) => d['day'] == day, orElse: () => null);
+    return dayData != null && dayData['table'] != null ? dayData['table'] : [];
   }
 
   final List<String> timeSlots = [
@@ -96,6 +73,7 @@ class _TimetableState extends State<Timetable> {
         ),
       );
     }
+    final daySubjects = getSubjectsForDay(selectedDay);
 
     return Column(
       children: [
@@ -103,12 +81,32 @@ class _TimetableState extends State<Timetable> {
           child: ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: timeSlots.length,
+            itemCount: daySubjects.isEmpty ? 1 : timeSlots.length,
             itemBuilder: (context, index) {
-              final List<dynamic> daySubjects = timetableData?['schedule']
-                      ?.firstWhere((day) => day['day'] == selectedDay,
-                          orElse: () => {'table': []})['table'] ??
-                  [];
+              if (daySubjects.isEmpty) {
+                return Container(
+                  height: 120,
+                  margin: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: Color.fromRGBO(25, 28, 32, 1), width: 3),
+                    color: AppColors.errorBackground,
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Holiday",
+                      style: TextStyle(
+                        color: AppColors.errorColor,
+                        fontSize: 30,
+                        fontFamily: 'Geist',
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                );
+              }
 
               final subject =
                   index < daySubjects.length ? daySubjects[index] : null;
@@ -204,7 +202,8 @@ class _TimetableState extends State<Timetable> {
             IconButton(
               onPressed: () {
                 setState(() {
-                  selectedDay = selectedDay > 1 ? selectedDay - 1 : 5;
+                  final day = selectedDay ?? globalTodayDayOrder ?? 0;
+                  selectedDay = day > 1 ? day - 1 : 5;
                   isTodaySelected = selectedDay == globalTodayDayOrder;
                 });
               },
@@ -213,7 +212,9 @@ class _TimetableState extends State<Timetable> {
               iconSize: 15,
             ),
             Text(
-              'Day $selectedDay',
+              getSubjectsForDay(selectedDay).isEmpty
+                  ? 'Holiday'
+                  : 'Day $selectedDay',
               style: const TextStyle(
                 color: AppColors.accentColor,
                 fontSize: 15,
@@ -224,7 +225,8 @@ class _TimetableState extends State<Timetable> {
             IconButton(
               onPressed: () {
                 setState(() {
-                  selectedDay = selectedDay < 5 ? selectedDay + 1 : 1;
+                  final day = selectedDay ?? globalTodayDayOrder ?? 0;
+                  selectedDay = day < 5 ? day +1  : 1;
                   isTodaySelected = selectedDay == globalTodayDayOrder;
                 });
               },
