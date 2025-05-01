@@ -27,7 +27,7 @@ class ScoreBox extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: isTotal
-            ? AppColors.totBackground
+            ? AppColors.successBackground
             : const Color.fromRGBO(9, 11, 17, 1),
         borderRadius: BorderRadius.circular(20),
         border: isPerfectScore && !isTotal
@@ -59,8 +59,8 @@ class ScoreBox extends StatelessWidget {
   }
 
   Color _getTextColor() {
-    if (isTotal) return AppColors.totColor;
-    if (isPerfectScore) return Colors.green;
+    if (isTotal) return AppColors.successColor;
+    if (isPerfectScore) return AppColors.successColor;
     if (score == 'Abs' || isLessThanHalf) return Colors.red;
     return Colors.white;
   }

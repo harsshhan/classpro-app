@@ -5,8 +5,11 @@ class UserProvider with ChangeNotifier {
   Map<String, dynamic> _marksData = {};
   Map<String, dynamic> _attendanceData = {};
   Map<String, dynamic> _timetableData = {};
+  Map<String, dynamic> _courseData = {};
   bool _isLoading = true;
 
+  Map<String, dynamic> get courseData => _courseData;
+  List<dynamic> get courseList => courseData['courses'];
   Map<String, dynamic> get userData => _userData;
   Map<String, dynamic> get marksData => _marksData;
   Map<String, dynamic> get attendanceData => _attendanceData;
@@ -45,6 +48,11 @@ class UserProvider with ChangeNotifier {
 
   void setCalendarData(Map<String, dynamic> data) {
     _calendarData = data;
+    notifyListeners();
+  }
+
+  void setCourseData(Map<String, dynamic> data) {
+    _courseData = data;
     notifyListeners();
   }
 }

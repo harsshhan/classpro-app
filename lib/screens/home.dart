@@ -11,7 +11,8 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../api/service.dart';
+import '../services/api_service.dart';
+import '../services/initializer.dart';
 import '../styles.dart';
 
 class Home extends StatefulWidget {
@@ -23,45 +24,50 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   Future<void> refreshAppData(BuildContext context) async {
-  try {
-    final bool result = await InternetConnectionChecker.instance.hasConnection;
-    if (!mounted) return;
+    try {
+      final bool result =
+          await InternetConnectionChecker.instance.hasConnection;
+      if (!mounted) return;
 
-    if (result) {
-      final api = await ApiService.create();
+      if (result) {
+        final api = await ApiService.create();
 
-      final userData = await api.validateToken();
-      final marks = await api.getMarks();
-      final attendance = await api.getAttendance();
-      final timetable = await api.getTimetable();
-      final calendar = await api.getCalendar();
+        final userData = await api.validateToken();
+        final marks = await api.getMarks();
+        final attendance = await api.getAttendance();
+        final timetable = await api.getTimetable();
+        final calendar = await api.getCalendar();
 
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.setUserData(userData);
-      userProvider.setMarksData(marks);
-      userProvider.setAttendanceData(attendance);
-      userProvider.setTimetableData(timetable);
-      userProvider.setCalendarData(calendar);
-    } else {
-      Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => NoInternetScreen(
-          onRetry: () async {
-            Navigator.of(context).pop(); 
-            await refreshAppData(context); 
-          },
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.setUserData(userData);
+        userProvider.setMarksData(marks);
+        userProvider.setAttendanceData(attendance);
+        userProvider.setTimetableData(timetable);
+        userProvider.setCalendarData(calendar);
+      } else {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => NoInternetScreen(
+            onRetry: () async {
+              Navigator.of(context).pop();
+              await refreshAppData(context);
+            },
+          ),
+        ));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to refresh: $e'),
+          backgroundColor: Colors.red,
         ),
-      ));
+      );
     }
-  } catch (e) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Failed to refresh: $e'),
-        backgroundColor: Colors.red,
-      ),
-    );
   }
-}
+
+  void _navigateToLogin() {
+    Navigator.pushReplacementNamed(context, '/login');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +81,11 @@ class _HomeState extends State<Home> {
             currentRoute: '/home',
           ),
           body: RefreshIndicator(
-              onRefresh: () => refreshAppData(context),
+              onRefresh: () async => await AppInitializer.initialize(
+                    context,
+                    navigateToLogin: _navigateToLogin,
+                    showSnackBarOnError: true,
+                  ),
               child: Padding(
                 padding: const EdgeInsets.all(18),
                 child: SingleChildScrollView(
