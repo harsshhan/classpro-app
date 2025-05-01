@@ -85,6 +85,17 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>> getCourses() async {
+    try {
+      final response = await _dio.get('/courses');
+      return response.data;
+    } catch (e) {
+      throw Exception('Failed to fetch timetable');
+    }
+  }
+
+
+
   Future<void> login(String account, String password) async {
     try {
       final response = await _dio.post(
