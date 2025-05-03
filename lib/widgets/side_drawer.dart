@@ -5,7 +5,7 @@ import 'package:classpro/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../api/service.dart';
+import '../services/api_service.dart';
 
 class CustomDrawer extends StatefulWidget {
   final String currentRoute;
@@ -88,32 +88,32 @@ class _CustomDrawerState extends State<CustomDrawer> {
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                const Text(
-                  'Community: ',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontFamily: 'Geist',
-                      fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(width: 12),
-                SizedBox(
-                  width: 12,
-                  child: InkWell(
-                    onTap: () {},
-                    child: Image.asset(
-                      'assets/icons/whatsapp_icon.png',
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          //   child: Row(
+          //     children: [
+          //       const Text(
+          //         'Community: ',
+          //         style: TextStyle(
+          //             color: Colors.white,
+          //             fontSize: 12,
+          //             fontFamily: 'Geist',
+          //             fontWeight: FontWeight.w500),
+          //       ),
+          //       const SizedBox(width: 12),
+          //       SizedBox(
+          //         width: 12,
+          //         child: InkWell(
+          //           onTap: () {},
+          //           child: Image.asset(
+          //             'assets/icons/whatsapp_icon.png',
+          //             color: Colors.white,
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );
@@ -278,7 +278,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   InkWell(
                     onTap: () async {
                       ApiService apiService = await ApiService.create();
-                      await apiService.logout();
+                      await apiService.logout(context);
                     },
                     child: Container(
                       width: double.infinity,

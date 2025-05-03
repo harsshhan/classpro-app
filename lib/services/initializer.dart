@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../provider/user_provider.dart';
 import '../services/api_service.dart';
 
-
 class AppInitializer {
   static Future<void> initialize(
     BuildContext context, {
@@ -20,23 +19,27 @@ class AppInitializer {
 
       final api = await ApiService.create();
 
-      final userData = await api.validateToken();
-      final marks = await api.getMarks();
-      final attendance = await api.getAttendance();
-      final timetable = await api.getTimetable();
-      final calendar = await api.getCalendar();
-      final courses = await api.getCourses();
+      // Fire all API calls in parallel
+      final results = await Future.wait([
+        api.validateToken(),
+        api.getMarks(),
+        api.getAttendance(),
+        api.getTimetable(),
+        api.getCalendar(),
+        api.getCourses(),
+      ]);
 
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.setUserData(userData);
-      userProvider.setMarksData(marks);
-      userProvider.setAttendanceData(attendance);
-      userProvider.setTimetableData(timetable);
-      userProvider.setCalendarData(calendar);
-      userProvider.setCourseData(courses);
+
+      userProvider.setUserData(results[0]);
+      userProvider.setMarksData(results[1]);
+      userProvider.setAttendanceData(results[2]);
+      userProvider.setTimetableData(results[3]);
+      userProvider.setCalendarData(results[4]);
+      userProvider.setCourseData(results[5]);
       userProvider.setLoading(false);
 
-      navigateToHome?.call(); 
+      navigateToHome?.call();
     } catch (e) {
       if (showSnackBarOnError) {
         ScaffoldMessenger.of(context).showSnackBar(

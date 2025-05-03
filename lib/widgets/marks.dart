@@ -1,7 +1,6 @@
 import 'package:classpro/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../api/service.dart';
 import '../styles.dart';
 import 'score_box.dart';
 
