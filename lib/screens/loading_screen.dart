@@ -1,8 +1,9 @@
-import 'package:classpro/api/service.dart';
-import 'package:classpro/provider/user_provider.dart';
+import 'package:classpro/utils/network_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:provider/provider.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+
+import '../services/initializer.dart';
+import 'connectionScreen.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -14,68 +15,46 @@ class LoadingScreen extends StatefulWidget {
 class _LoadingScreenState extends State<LoadingScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  late CurvedAnimation _curvedAnimation;
+
+  bool? _isConnected;
 
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(seconds: 1),
       vsync: this,
+    )..repeat();
+    _curvedAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOutCubic,
     );
 
-    _startHourglassAnimation();
-    _initAppData(context);
+    _checkInternetAndInitialize();
   }
 
-  Future<void> _startHourglassAnimation() async {
-    while (mounted) {
-      await _controller.forward(from: 0.0);
-      await Future.delayed(const Duration(milliseconds: 100));
+  Future<void> _checkInternetAndInitialize() async {
+    final bool result = await NetworkUtils.hasInternetConnection();
+    if (!mounted) return;
+
+    if (!result) {
+      setState(() {
+        _isConnected = false;
+      });
+    } else {
+      setState(() {
+        _isConnected = true;
+      });
+
+      AppInitializer.initialize(
+        context,
+        navigateToLogin: _navigateToLogin,
+        navigateToHome: _navigateToHome,
+        showSnackBarOnError: true,
+      );
     }
   }
-
-  Future<void> _initAppData(BuildContext context) async {
-  try {
-    final token = await secureStorage.read(key: 'X-CSRF-TOKEN');
-    if (token == null || token.isEmpty) {
-      _navigateToLogin();
-      return;
-    }
-
-    final api = await ApiService.create();
-
-
-    final userData = await api.validateToken();
-    final marks = await api.getMarks();
-    final attendance = await api.getAttendance();
-    final timetable = await api.getTimetable();
-    final calendar = await api.getCalendar();
-    
-
-
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    userProvider.setUserData(userData);
-    userProvider.setMarksData(marks);
-    userProvider.setAttendanceData(attendance);
-    userProvider.setTimetableData(timetable);
-    userProvider.setCalendarData(calendar);
-
-    userProvider.setLoading(false);
-
-    _navigateToHome();
-  } catch (e) {
-    SnackBar(
-      content: Text(
-        'Error initializing app data: $e',
-        style: const TextStyle(color: Colors.red),
-      ),
-      backgroundColor: Colors.black87,
-    );
-    _navigateToLogin();
-  }
-}
 
   void _navigateToLogin() {
     Navigator.pushReplacementNamed(context, '/login');
@@ -87,14 +66,18 @@ class _LoadingScreenState extends State<LoadingScreen>
 
   @override
   Widget build(BuildContext context) {
+    if (_isConnected == false) {
+      return NoInternetScreen(onRetry: _checkInternetAndInitialize);
+    }
+
     return Scaffold(
       backgroundColor: const Color.fromRGBO(26, 29, 33, 1),
       body: Center(
         child: AnimatedBuilder(
-          animation: _controller,
+          animation: _curvedAnimation,
           builder: (context, child) {
             return Transform.rotate(
-              angle: _controller.value * 3.14159,
+              angle: _curvedAnimation.value * 2 * 3.14159,
               child: SizedBox(
                 height: 96,
                 width: 48,

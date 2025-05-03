@@ -1,4 +1,3 @@
-import 'package:classpro/services/api_service.dart';
 import 'package:classpro/provider/user_provider.dart';
 import 'package:classpro/styles.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +30,6 @@ class _TimetableState extends State<Timetable> {
         Provider.of<UserProvider>(context, listen: false).todayDayOrder);
     selectedDay = globalTodayDayOrder;
     isTodaySelected = selectedDay == globalTodayDayOrder;
-    print(timetableData);
     isLoading = false;
   }
 

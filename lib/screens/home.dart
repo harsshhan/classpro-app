@@ -1,6 +1,7 @@
 import 'package:android_intent_plus/android_intent.dart' as android_intent;
 import 'package:classpro/provider/user_provider.dart';
 import 'package:classpro/screens/connectionScreen.dart';
+import 'package:classpro/utils/network_utils.dart';
 import 'dart:io' show Platform;
 import 'package:classpro/widgets/attendance.dart';
 import 'package:classpro/widgets/marks.dart';
@@ -81,11 +82,26 @@ class _HomeState extends State<Home> {
             currentRoute: '/home',
           ),
           body: RefreshIndicator(
-              onRefresh: () async => await AppInitializer.initialize(
-                    context,
-                    navigateToLogin: _navigateToLogin,
-                    showSnackBarOnError: true,
-                  ),
+              onRefresh: () async {
+                final hasInternet = await NetworkUtils.hasInternetConnection();
+
+                if (!hasInternet) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content:
+                          Text('No internet connection. Please try again.'),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                  return;
+                }
+
+                await AppInitializer.initialize(
+                  context,
+                  navigateToLogin: _navigateToLogin,
+                  showSnackBarOnError: true,
+                );
+              },
               child: Padding(
                 padding: const EdgeInsets.all(18),
                 child: SingleChildScrollView(
@@ -105,11 +121,11 @@ class _HomeState extends State<Home> {
                               decoration: TextDecoration.none,
                             ),
                           ),
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.download_sharp,
-                                color: Colors.white),
-                          ),
+                          // IconButton(
+                          //   onPressed: () {},
+                          //   icon: const Icon(Icons.download_sharp,
+                          //       color: Colors.white),
+                          // ),
                         ],
                       ),
                       const Timetable(),

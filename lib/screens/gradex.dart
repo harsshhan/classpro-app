@@ -32,6 +32,9 @@ class _GradexPageState extends State<GradexPage> {
     int totalWeightedPoints = 0;
 
     selectedGrades.forEach((subject, data) {
+      final included = data['included'] ?? true; 
+      if (included == false ) return;
+
       final grade = data['grade'];
       final credits = data['credits'] is int
           ? data['credits'] as int
@@ -61,6 +64,7 @@ class _GradexPageState extends State<GradexPage> {
           selectedGrades[subject] = {
             'grade': 'A',
             'credits': credit,
+            'included': true
           };
         }
       }
@@ -117,11 +121,22 @@ class _GradexPageState extends State<GradexPage> {
                             scored: storedMarksData[index]['overall']['scored'],
                             total: storedMarksData[index]['overall']['total'],
                             grade: selectedGrades[subject]?['grade'] ?? 'A',
+                            included:
+                                selectedGrades[subject]?['included'] ?? true,
+                            onIncludeChanged: (val) {
+                              setState(() {
+                                selectedGrades[subject]?['included'] = val;
+                                sgpa = calculateSGPA();
+                              });
+                            },
                             onGradeSelected: (grade, credits) {
                               setState(() {
                                 selectedGrades[subject] = {
                                   'grade': grade,
                                   'credits': credits,
+                                  'included': selectedGrades[subject]
+                                          ?['included'] ??
+                                      true
                                 };
                                 sgpa = calculateSGPA();
                               });
@@ -150,13 +165,10 @@ class _GradexPageState extends State<GradexPage> {
                         return const SizedBox();
                       }
                     }),
-                    const SizedBox(
-                        height: 100), 
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),
-
-
               Positioned(
                 bottom: 20,
                 left: 0,
@@ -168,8 +180,7 @@ class _GradexPageState extends State<GradexPage> {
                       padding:
                           EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                       decoration: BoxDecoration(
-                        color: AppColors
-                            .successBackground, 
+                        color: AppColors.successBackground,
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Center(
@@ -189,8 +200,7 @@ class _GradexPageState extends State<GradexPage> {
                             Align(
                               alignment: Alignment.bottomRight,
                               child: Padding(
-                                padding: const EdgeInsets.only(
-                                    bottom: 4),
+                                padding: const EdgeInsets.only(bottom: 4),
                                 child: Text(
                                   "SGPA",
                                   style: TextStyle(

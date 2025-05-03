@@ -10,6 +10,8 @@ class GradexWidget extends StatefulWidget {
   final String scored;
   final String total;
   final String grade;
+  final bool included;
+  final Function(bool) onIncludeChanged;
   final Function(String grade, int credits) onGradeSelected;
   const GradexWidget({
     super.key,
@@ -18,6 +20,8 @@ class GradexWidget extends StatefulWidget {
     required this.scored,
     required this.total,
     required this.grade,
+    required this.included,
+    required this.onIncludeChanged,
     required this.onGradeSelected,
   });
 
@@ -99,233 +103,237 @@ class _GradexWidgetState extends State<GradexWidget> {
     final String total = widget.total;
 
     return Center(
-      child: Container(
-        margin: EdgeInsets.only(bottom: 10),
-        width: 350,
-        decoration: BoxDecoration(
-          color: AppColors.backgroundNormal,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    widget.courseName,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 3,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+      child: 
+        
+        Container(
+          margin: EdgeInsets.only(bottom: 10),
+          width: 350,
+          decoration: BoxDecoration(
+            color: AppColors.backgroundNormal,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.courseName,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 20),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    ScoreBoxPair(scored: scored, total: total),
-                    const SizedBox(height: 10),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isSelected = !isSelected;
-                        });
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            isSelected
-                                ? Icons.radio_button_checked
-                                : Icons.radio_button_off,
-                            size: 15,
-                            color: AppColors.accentColor,
-                          ),
-                          const SizedBox(width: 4),
-                          const Text(
-                            "Included",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-            Text("Credit: ${widget.credit}",
-                style: TextStyle(
-                    color: AppColors.accentColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500)),
-            const SizedBox(height: 15),
-            GradeSliderWidget(
-              initialGrade: widget.grade,
-              onChanged: (grade) {
-                currentGrade = grade;
-                goalMarks = calculateRequiredMarks(
-                  (double.tryParse(widget.scored) ?? 0) + remaining.toDouble(),
-                  currentGrade,
-                );
-                widget.onGradeSelected(currentGrade, int.parse(widget.credit));
-              },
-            ),
-            const SizedBox(height: 10),
-            Divider(
-              color: AppColors.accentColor.withAlpha((255 * 0.5).round()),
-              thickness: 1,
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Goal for sem exam",
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0D0D0D),
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: Row(
+                  const SizedBox(width: 20),
+                  Column(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 4),
-                        child: Text(
-                          goalMarks.toString(),
-                          style: goalMarks > 75
-                              ? TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.errorColor,
-                                )
-                              : goalMarks < 0
-                                  ? TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.accentColor,
-                                    )
-                                  : TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.successColor,
-                                    ),
+                      ScoreBoxPair(scored: scored, total: total),
+                      const SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () {
+                          isSelected = !isSelected;
+                          widget.onIncludeChanged(isSelected);
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(
+                              isSelected
+                                  ? Icons.radio_button_checked
+                                  : Icons.radio_button_off,
+                              size: 15,
+                              color: AppColors.accentColor,
+                            ),
+                            const SizedBox(width: 4),
+                            const Text(
+                              "Included",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ],
                         ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.successColor,
-                          borderRadius: BorderRadius.circular(32),
-                        ),
-                        margin: EdgeInsets.only(left: 4),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        child: Text(
-                          "75",
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
+                      )
                     ],
                   ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 32,
-                  child: Center(
-                    child: Text(
-                      "Expected remaining from $maxRemaining:",
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white),
-                    ),
-                  ),
-                ),
-                Container(
-                  height: 32,
-                  width: 54,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  child: Center(
-                    child: TextField(
-                      controller: _remainingController,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
+                ],
+              ),
+              Text("Credit: ${widget.credit}",
+                  style: TextStyle(
+                      color: AppColors.accentColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500)),
+              const SizedBox(height: 15),
+              GradeSliderWidget(
+                initialGrade: widget.grade,
+                onChanged: (grade) {
+                  currentGrade = grade;
+                  goalMarks = calculateRequiredMarks(
+                    (double.tryParse(widget.scored) ?? 0) +
+                        remaining.toDouble(),
+                    currentGrade,
+                  );
+                  widget.onGradeSelected(
+                      currentGrade, int.parse(widget.credit));
+                },
+              ),
+              const SizedBox(height: 10),
+              Divider(
+                color: AppColors.accentColor.withAlpha((255 * 0.5).round()),
+                thickness: 1,
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Goal for sem exam",
+                    style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0D0D0D),
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8, right: 4),
+                          child: Text(
+                            goalMarks.toString(),
+                            style: goalMarks > 75
+                                ? TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.errorColor,
+                                  )
+                                : goalMarks < 0
+                                    ? TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.accentColor,
+                                      )
+                                    : TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.successColor,
+                                      ),
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.successColor,
+                            borderRadius: BorderRadius.circular(32),
+                          ),
+                          margin: EdgeInsets.only(left: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          child: Text(
+                            "75",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 32,
+                    child: Center(
+                      child: Text(
+                        "Expected remaining from $maxRemaining:",
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white),
                       ),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: '0',
-                        hintStyle: TextStyle(
+                    ),
+                  ),
+                  Container(
+                    height: 32,
+                    width: 54,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                    child: Center(
+                      child: TextField(
+                        controller: _remainingController,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
-                        counterText: '',
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: '0',
+                          hintStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          counterText: '',
+                        ),
+                        keyboardType: TextInputType.number,
+                        maxLength: 2,
+                        maxLines: 1,
+                        cursorColor: Colors.white,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(2),
+                          TextInputFormatter.withFunction((oldValue, newValue) {
+                            if (newValue.text.isEmpty) return newValue;
+
+                            final int? value = int.tryParse(newValue.text);
+                            if (value != null && value <= maxRemaining) {
+                              return newValue;
+                            }
+
+                            return oldValue;
+                          }),
+                        ],
                       ),
-                      keyboardType: TextInputType.number,
-                      maxLength: 2,
-                      maxLines: 1,
-                      cursorColor: Colors.white,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(2),
-                        TextInputFormatter.withFunction((oldValue, newValue) {
-                          if (newValue.text.isEmpty) return newValue;
-
-                          final int? value = int.tryParse(newValue.text);
-                          if (value != null && value <= maxRemaining) {
-                            return newValue;
-                          }
-
-                          return oldValue;
-                        }),
-                      ],
                     ),
-                  ),
-                )
-              ],
-            ),
-          ],
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
+      
     );
   }
 }

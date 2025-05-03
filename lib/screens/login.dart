@@ -1,9 +1,10 @@
-import 'package:classpro/api/service.dart';
+import 'package:classpro/services/api_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../services/initializer.dart';
 import '../styles.dart';
 
 class Login extends StatefulWidget {
@@ -57,10 +58,16 @@ class _LoginState extends State<Login> {
     );
   }
 
+  void _navigateToLogin() {
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+
+  void _navigateToHome() {
+    Navigator.pushReplacementNamed(context, '/gradex');
+  }
+
   @override
   Widget build(BuildContext context) {
-    
-
     return Container(
       child: Scaffold(
         backgroundColor: AppColors.bgColor,
@@ -68,7 +75,7 @@ class _LoginState extends State<Login> {
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Container(
-              height: 410,
+              height: 380,
               width: 408,
               decoration: BoxDecoration(
                   color: Colors.black, borderRadius: BorderRadius.circular(50)),
@@ -81,41 +88,48 @@ class _LoginState extends State<Login> {
                     Image.asset(
                       'assets/icons/logo.png',
                       width: 150,
-                      height: 100,
+                      height: 40,
+                      color: AppColors.accentColor,
                     ),
+                    const SizedBox(height: 5),
                     const Text(
                       "University data, beautifully presented at your",
                       style: TextStyle(
                           fontSize: 12,
+                          fontWeight: FontWeight.w500,
                           color: Colors.grey,
                           decoration: TextDecoration.none),
                     ),
-                    const SizedBox(height: 5),
                     const Text(
                       "fingertips",
                       style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey,
+                          fontWeight: FontWeight.w500,
                           decoration: TextDecoration.none),
                     ),
-                    const SizedBox(height: 25),
+                    const SizedBox(height: 40),
                     Container(
                       height: 50,
                       width: 250,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                       decoration: const BoxDecoration(
                         color: AppColors.bgColor,
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(15.0),
                             topRight: Radius.circular(15)),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
+                      child: Center(
                         child: TextField(
                           style: TextStyle(color: Colors.white),
                           controller: _userIdController,
                           decoration: const InputDecoration(
                               hintText: "User ID",
-                              hintStyle: TextStyle(color: Colors.grey),
+                              hintStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: "Geist"),
                               border: InputBorder.none),
                         ),
                       ),
@@ -124,26 +138,26 @@ class _LoginState extends State<Login> {
                     Container(
                       height: 50,
                       width: 250,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                       decoration: const BoxDecoration(
                         color: AppColors.bgColor,
                         borderRadius: BorderRadius.only(
                             bottomLeft: Radius.circular(15),
                             bottomRight: Radius.circular(15)),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: TextField(
-                          style: TextStyle(color: Colors.white),
-                          controller: _passwordController,
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                              hintText: "Password",
-                              hintStyle: TextStyle(color: Colors.grey),
-                              border: InputBorder.none),
-                        ),
+                      child: TextField(
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w500),
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                            hintText: "Password",
+                            hintStyle: TextStyle(color: Colors.grey),
+                            border: InputBorder.none),
                       ),
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 25),
                     GestureDetector(
                       onTap: () async {
                         String userId = _userIdController.text.trim();
@@ -153,14 +167,22 @@ class _LoginState extends State<Login> {
                             _isLoading = true;
                           });
                           bool isLoggedIn = await login(userId, password);
-                          setState(() {
-                            _isLoading = false; 
-                          });
 
                           if (isLoggedIn) {
                             ApiService apiService = await ApiService.create();
-                            await apiService.validateToken();
-
+                            final user = await apiService.validateToken();
+                            if (user != null) {
+                              // if (!mounted) return;
+                              // setState(() {
+                              //   _isLoading = false;
+                              // });
+                              AppInitializer.initialize(
+                                context,
+                                navigateToLogin: _navigateToLogin,
+                                navigateToHome: _navigateToHome,
+                                showSnackBarOnError: true,
+                              );
+                            }
                           } else {
                             _showSnackbar(
                                 'Login failed. Please check your credentials.');
@@ -172,23 +194,27 @@ class _LoginState extends State<Login> {
                       child: Container(
                         height: 40,
                         width: 180,
+                        padding:
+                            EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                         decoration: BoxDecoration(
-                            color: const Color.fromRGBO(127, 127, 149, 1),
-                            borderRadius: BorderRadius.circular(15)),
-                        child:  Center(
+                            color: AppColors.accentColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Center(
                           child: _isLoading
-                              ?  SizedBox(
+                              ? SizedBox(
                                   height: 20,
                                   width: 20,
                                   child: CircularProgressIndicator(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     strokeWidth: 2,
                                   ),
                                 )
                               : Text(
                                   "Login",
                                   style: TextStyle(
-                                      color: Colors.black, fontSize: 20),
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
                         ),
                       ),

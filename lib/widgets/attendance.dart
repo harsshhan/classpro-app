@@ -44,7 +44,7 @@ class _AttendanceState extends State<Attendance> {
         int.parse(course['hoursConducted']) - int.parse(course['hoursAbsent']);
     final double percentage = double.parse(course['attendancePercentage']);
 
-    Color percentageColor = percentage >= 75 ? Colors.white : Colors.red;
+    Color percentageColor = percentage >= 75 ? Colors.white : AppColors.errorColor;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8.0),
@@ -291,16 +291,15 @@ class _AttendanceState extends State<Attendance> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              IconButton(
-                onPressed: () {
-                  // TODO: Implement prediction logic
+              InkWell(
+                onTap: () {
+                  
                 },
-                icon: const Icon(
-                  Icons.analytics_outlined,
-                  color: Colors.white,
-                ),
-                tooltip: 'Predict Attendance',
-              ),
+                child: Image.asset('assets/icons/prediction.png',
+                height: 18,
+                width: 18,
+                    color: AppColors.accentColor),
+              )
             ],
           ),
         ),

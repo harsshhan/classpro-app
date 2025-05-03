@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         textTheme: Theme.of(context).textTheme.apply(fontFamily: 'Geist'),
       ),
       debugShowCheckedModeBanner: false,
-      home: const Root(),
+      home: LoadingScreen(),
       routes: {
         '/login': (context) => Login(),
         '/gradex': (context) => GradexPage(),
@@ -47,41 +47,3 @@ class MyApp extends StatelessWidget {
 
 
 
-class Root extends StatefulWidget {
-  const Root({super.key});
-
-  @override
-  State<Root> createState() => _RootState();
-}
-
-class _RootState extends State<Root> {
-  bool? _isConnected;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkInternet();
-  }
-
-
-  Future<void> _checkInternet() async {
-  final bool result = await InternetConnectionChecker.instance.hasConnection;
-  if (!mounted) return; // Prevent setState after dispose
-  setState(() {
-    _isConnected = result;
-  });
-}
-
-  @override
-  Widget build(BuildContext context) {
-    if (_isConnected == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    return _isConnected!
-        ? const LoadingScreen()
-        : NoInternetScreen(onRetry: _checkInternet);
-  }
-}
