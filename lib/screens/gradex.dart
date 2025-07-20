@@ -85,6 +85,7 @@ class _GradexPageState extends State<GradexPage> {
       color: AppColors.backgroundDark,
       child: SafeArea(
         child: Scaffold(
+          drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.5,
           backgroundColor: AppColors.backgroundDark,
           drawer: CustomDrawer(currentRoute: '/gradex'),
           floatingActionButton: Builder(
