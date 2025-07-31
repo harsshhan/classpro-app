@@ -1,4 +1,5 @@
 import 'package:classpro/provider/user_provider.dart';
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../styles.dart';
@@ -15,12 +16,11 @@ class _MarksState extends State<Marks> {
   bool isLoading = true;
   String errorMessage = '';
 
-
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final storedMarksData = userProvider.marksData;
-    
+
     final isLoading = userProvider.isLoading;
 
     final List<dynamic> marks = storedMarksData['marks'] ?? [];
@@ -90,9 +90,8 @@ class _MarksState extends State<Marks> {
       margin: const EdgeInsets.only(top: 5, bottom: 5),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: const Color.fromRGBO(25, 28, 32, 1),
-      ),
+          borderRadius: BorderRadius.circular(20),
+          color: AppColors.backgroundNormal),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -126,8 +125,19 @@ class _MarksState extends State<Marks> {
             ],
           ),
           const SizedBox(height: 20),
-          if (testPerformance != null)
-            ...testPerformance.map((test) {
+          if (testPerformance == null)
+            Container(
+              padding: EdgeInsets.all(12),
+              margin: EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                  color: AppColors.darkSiide,
+                  borderRadius: BorderRadius.circular(10)),
+              child: Center(
+                child: Text("No Tests Conducted",style:TextStyle(color: AppColors.darkAccent,fontSize: 12,),)
+              ),
+            )
+          else
+            ...testPerformance.map<Widget>((test) {
               final testName = test['test'];
               final testMarks = test['marks'];
               final scored = testMarks['scored'];
@@ -153,10 +163,17 @@ class _MarksState extends State<Marks> {
                 ),
               );
             }).toList(),
-          Divider(
-            color: Colors.grey.shade600,
-            thickness: 1,
+
+          DottedLine(
+            dashLength: 4,
+            dashGapLength: 10,
+            lineThickness: 1,
+            dashColor: AppColors.backgroundLight,
           ),
+          // Divider(
+          //   color: Colors.grey.shade600,
+          //   thickness: 1,
+          // ),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

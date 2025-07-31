@@ -12,7 +12,7 @@ class TextStyles {
     color: Colors.white
   );
   static const TextStyle courseName = TextStyle(
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: FontWeight.w500,
     color: Colors.white
   );
@@ -42,12 +42,17 @@ class TextStyles {
 
 class AppColors {
   static const Color darkColor = Color.fromRGBO(10, 12, 16, 1); 
+  static const Color darkSiide = Color.fromRGBO(23,29,38, 1); 
+  static const Color darkAccent = Color.fromRGBO(179,179,209, 1); 
+  
   static const Color darkTransparent = Color.fromRGBO(10, 12, 16, 0); 
   static const Color bgColor = Color.fromRGBO(9, 11, 17, 1);
   static const Color tot_marks_bgColor = Color.fromRGBO(204, 204, 205, 1);
 
 
   static const backgroundDark = Color.fromRGBO(6,9,13,1);
+  static const backgroundLight = Color.fromRGBO(30,35,43,1);
+
 
   static const theory = Color.fromRGBO(242, 216, 105, 1);
   static const practical = Color.fromRGBO(105, 224, 105, 1);
