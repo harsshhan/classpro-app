@@ -128,6 +128,7 @@ class _HomeState extends State<Home> {
                           // ),
                         ],
                       ),
+                      const SizedBox(height: 20),
                       const Timetable(),
                       const SizedBox(height: 20),
                       const Attendance(),
@@ -141,6 +142,7 @@ class _HomeState extends State<Home> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
+                      const SizedBox(height: 20),
                       const Marks(),
                       const SizedBox(height: 20),
                       Center(

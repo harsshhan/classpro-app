@@ -179,7 +179,7 @@ class _AttendanceState extends State<Attendance> {
                     // Total
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                          horizontal: 16, vertical: 5),
                       decoration: BoxDecoration(
                         color: AppColors.totBackground,
                         borderRadius: BorderRadius.circular(16),
@@ -286,18 +286,20 @@ class _AttendanceState extends State<Attendance> {
               const Text(
                 'Attendance',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontFamily: 'Geist',
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.none,
+                            ),
               ),
               InkWell(
                 onTap: () {
                   
                 },
                 child: Image.asset('assets/icons/prediction.png',
-                height: 18,
-                width: 18,
+                height: 20,
+                width: 20,
                     color: AppColors.accentColor),
               )
             ],
